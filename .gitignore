@@ -1,0 +1,4 @@
+/backend/.env
+/backend/node_modules
+/client_app/node_modules
+/client_app/.env
