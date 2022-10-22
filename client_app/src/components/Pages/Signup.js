@@ -3,7 +3,7 @@ import file from "../../images/file.png";
 import google from "../../images/google.svg";
 const SignUp = () => {
   return (
-    <div className="">
+    <div className="w-4/5 mx-auto">
       <div className="flex flex-col space-y-4">
         <div className="flex space-x-4">
           <img src={file} alt="file" className="w-8 h-8" />

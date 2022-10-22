@@ -4,12 +4,15 @@ import { Link } from "react-router-dom";
 import file from "../../images/file.png";
 import google from "../../images/google.svg";
 import SignUp from "./Signup";
+import { LOGIN } from "../../Graphql/mutations";
+import { useGQLMutation } from "../../hooks/useGqlMutations";
 
 const Login = () => {
   const [tabState, changeStabState] = useState({
     login: true,
     createAccount: false,
   });
+
   return (
     <div>
       {tabState.login ? (
@@ -59,6 +62,12 @@ const UserLogin = () => {
     passwordErr: false,
     emailErrMsg: "",
     passwordErrMsg: "",
+  });
+
+  const { mutateAsync: userLogin } = useGQLMutation(LOGIN, {
+    onSuccess: () => {
+      console.log("user is ready to be logged in");
+    },
   });
   return (
     <div className="">
@@ -194,7 +203,7 @@ const UserLogin = () => {
         <div>
           <button
             className="w-full px-6 py-3 rounded-xl bg-brightRed  transition hover:bg-brightRedLight focus:bg-brightRedLight active:bg-brightRed"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault();
               // console.log({ email, password });
 
@@ -228,7 +237,18 @@ const UserLogin = () => {
                     "Password should not be less than 6 characters",
                 });
               } else {
-                console.log("about to login user");
+                // console.log("about to login user");
+
+                let userLogIn = await userLogin({
+                  email: email,
+                  password: password,
+                });
+
+                if (userLogIn.userLogin) {
+                  console.log(userLogIn);
+                } else {
+                  console.log("user authentication failed");
+                }
               }
             }}
           >
