@@ -47,13 +47,13 @@ const createUser = async (userData) => {
         } else {
           return {
             status: false,
-            message: "Failed to create user",
+            message: "Failed to create user wawa 2",
           };
         }
       } catch (error) {
         return {
           status: false,
-          message: "Failed to create user",
+          message: "Failed to create user wawa 3",
         };
       }
     } else {
@@ -66,11 +66,9 @@ const createUser = async (userData) => {
   } else {
     return {
       status: false,
-      message: "Failed to create user",
+      message: "Failed to create user wawa 1",
     };
   }
-
-  return userData;
 };
 
 const login = async (userData) => {

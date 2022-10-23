@@ -1,7 +1,31 @@
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import file from "../../images/file.png";
 import google from "../../images/google.svg";
+import validateEmail from "../../helper/emailValidator";
+import { CREATE_ACCOUNT } from "../../Graphql/mutations";
+import { useGQLMutation } from "../../hooks/useGqlMutations";
 const SignUp = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [errorState, setErrorState] = useState({
+    emailError: false,
+    passwordErr: false,
+    firstNameErr: false,
+    lastNameErr: false,
+    phoneNumberErr: false,
+  });
+
+  const { mutateAsync: createUser } = useGQLMutation(CREATE_ACCOUNT, {
+    onSuccess: () => {
+      // console.log("user is ready to be logged in");
+    },
+  });
+
   return (
     <div className="w-4/5 mx-auto">
       <div className="flex flex-col space-y-4">
@@ -67,8 +91,8 @@ const SignUp = () => {
             </label>
             <input
               type="text"
-              // value={email}
-              className="
+              value={firstName}
+              className={`
               shadow
             appearance-none
             border
@@ -79,9 +103,28 @@ const SignUp = () => {
             text-gray-500
             leading-tight
             focus:outline-none focus:shadow-outline
-              "
+
+            ${
+              errorState.firstNameErr
+                ? ` border-solid
+            border-red-500
+              border-3`
+                : null
+            }
+              `}
               placeholder="John"
+              autoComplete="off"
               required
+              onChange={(text) => {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: false,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: false,
+                });
+                setFirstName(text.target.value);
+              }}
             />
           </div>
 
@@ -91,8 +134,8 @@ const SignUp = () => {
             </label>
             <input
               type="text"
-              // value={email}
-              className="
+              value={lastName}
+              className={`
               shadow
             appearance-none
             border
@@ -103,9 +146,28 @@ const SignUp = () => {
             text-gray-500
             leading-tight
             focus:outline-none focus:shadow-outline
-              "
+
+            ${
+              errorState.lastNameErr
+                ? ` border-solid
+            border-red-500
+              border-3`
+                : null
+            }
+              `}
               placeholder="Doe"
               required
+              autoComplete="off"
+              onChange={(text) => {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: false,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: false,
+                });
+                setLastName(text.target.value);
+              }}
             />
           </div>
         </div>
@@ -117,9 +179,9 @@ const SignUp = () => {
           </label>
           <input
             type="email"
-            // value={email}
-            className="
-              shadow
+            value={email}
+            className={`
+            shadow
             appearance-none
             border
             rounded
@@ -129,9 +191,28 @@ const SignUp = () => {
             text-gray-500
             leading-tight
             focus:outline-none focus:shadow-outline
-              "
+            ${
+              errorState.emailError
+                ? ` border-solid
+            border-red-500
+              border-3`
+                : null
+            }
+            
+            `}
             placeholder="name@filevert.com"
             required
+            autoComplete="off"
+            onChange={(text) => {
+              setErrorState({
+                emailError: false,
+                passwordErr: false,
+                firstNameErr: false,
+                lastNameErr: false,
+                phoneNumberErr: false,
+              });
+              setEmail(text.target.value);
+            }}
           />
         </div>
 
@@ -142,9 +223,9 @@ const SignUp = () => {
           </label>
           <input
             type="text"
-            // value={email}
-            className="
-              shadow
+            value={phoneNumber}
+            className={`
+            shadow
             appearance-none
             border
             rounded
@@ -154,9 +235,28 @@ const SignUp = () => {
             text-gray-500
             leading-tight
             focus:outline-none focus:shadow-outline
-              "
-            placeholder="Phone Number"
+
+            ${
+              errorState.phoneNumberErr
+                ? ` border-solid
+            border-red-500
+              border-3`
+                : null
+            }
+            `}
+            placeholder="+26599"
             required
+            autoComplete="off"
+            onChange={(text) => {
+              setErrorState({
+                emailError: false,
+                passwordErr: false,
+                firstNameErr: false,
+                lastNameErr: false,
+                phoneNumberErr: false,
+              });
+              setPhoneNumber(text.target.value);
+            }}
           />
         </div>
 
@@ -167,8 +267,9 @@ const SignUp = () => {
           <div className="flex flex-col items-end">
             <input
               type="password"
-              // value={password}
-              className="shadow
+              value={password}
+              className={`
+              shadow
             appearance-none
             border
             rounded
@@ -177,9 +278,28 @@ const SignUp = () => {
             px-3
             text-gray-500
             leading-tight
-            focus:outline-none focus:shadow-outline"
+            focus:outline-none focus:shadow-outline
+            ${
+              errorState.passwordErr
+                ? ` border-solid
+            border-red-500
+              border-3`
+                : null
+            }
+              `}
               placeholder="**********"
               required
+              autoComplete="off"
+              onChange={(text) => {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: false,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: false,
+                });
+                setPassword(text.target.value);
+              }}
             />
           </div>
         </div>
@@ -195,14 +315,109 @@ const SignUp = () => {
             />
           </div>
           <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-            I have accepted the{" "}
-            <span className="text-brightRedLight underline"> Terms of use</span> and
-            <span className="text-brightRedLight underline"> privacy policy</span>
+            I have accepted the
+            <span className="text-brightRedLight underline">Terms of use</span>
+            and
+            <span className="text-brightRedLight underline">
+              privacy policy
+            </span>
           </label>
         </div>
 
         <div>
-          <button className="w-full px-6 py-3 rounded-xl bg-brightRed  transition hover:bg-brightRedLight focus:bg-brightRedLight active:bg-brightRed">
+          <button
+            className="w-full px-6 py-3 rounded-xl bg-brightRed  transition hover:bg-brightRedLight focus:bg-brightRedLight active:bg-brightRed"
+            onClick={async (e) => {
+              e.preventDefault();
+
+              if (
+                firstName === "" &&
+                lastName === "" &&
+                email === "" &&
+                phoneNumber === "" &&
+                password === ""
+              ) {
+                setErrorState({
+                  emailError: true,
+                  passwordErr: true,
+                  firstNameErr: true,
+                  lastNameErr: true,
+                  phoneNumberErr: true,
+                });
+              } else if (firstName === "") {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: false,
+                  firstNameErr: true,
+                  lastNameErr: false,
+                  phoneNumberErr: false,
+                });
+              } else if (lastName === "") {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: false,
+                  firstNameErr: false,
+                  lastNameErr: true,
+                  phoneNumberErr: false,
+                });
+              } else if (email === "") {
+                setErrorState({
+                  emailError: true,
+                  passwordErr: false,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: false,
+                });
+              } else if (!validateEmail(email)) {
+                setErrorState({
+                  emailError: true,
+                  passwordErr: false,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: false,
+                });
+              } else if (phoneNumber === "") {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: false,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: true,
+                });
+              } else if (phoneNumber.length < 10) {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: false,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: true,
+                });
+              } else if (password === "") {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: true,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: false,
+                });
+              } else if (password.length < 6) {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: true,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: false,
+                });
+              } else {
+                console.log("Hello World");
+                let createUserData = await createUser({
+                  input: { firstName, lastName, email, phoneNumber, password },
+                });
+
+                console.log(createUserData);
+              }
+            }}
+          >
             <span className="font-semibold text-white text-lg">Sign Up</span>
           </button>
         </div>

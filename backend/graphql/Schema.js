@@ -6,7 +6,7 @@ type User{
     lastName: String,
     id: ID,
     email: String,
-    phoneNumber: Int,
+    phoneNumber: String,
     password: String
 }
 

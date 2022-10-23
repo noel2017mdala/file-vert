@@ -15,3 +15,12 @@ export const LOGIN = gql`
     }
   }
 `;
+
+export const CREATE_ACCOUNT = gql`
+  mutation ($input: UserInput) {
+    createUser(input: $input) {
+      status
+      message
+    }
+  }
+`;

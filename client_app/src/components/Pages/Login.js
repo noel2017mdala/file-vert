@@ -66,7 +66,7 @@ const UserLogin = () => {
 
   const { mutateAsync: userLogin } = useGQLMutation(LOGIN, {
     onSuccess: () => {
-      console.log("user is ready to be logged in");
+      // console.log("user is ready to be logged in");
     },
   });
   return (
