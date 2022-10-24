@@ -5,7 +5,13 @@ import google from "../../images/google.svg";
 import validateEmail from "../../helper/emailValidator";
 import { CREATE_ACCOUNT } from "../../Graphql/mutations";
 import { useGQLMutation } from "../../hooks/useGqlMutations";
-const SignUp = () => {
+import "react-phone-number-input/style.css";
+import PhoneInput from "react-phone-number-input";
+import { ToastContainer } from "react-toastify";
+
+import { notify } from "../../helper/notification";
+
+const SignUp = ({ loginTabState, loginTab }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -221,8 +227,10 @@ const SignUp = () => {
           <label className="block mb-2 text-sm font-medium text-brightRedLight">
             Phone Number
           </label>
-          <input
-            type="text"
+          <PhoneInput
+            defaultCountry="MW"
+            // type="text"
+            // value={phoneNumber}
             value={phoneNumber}
             className={`
             shadow
@@ -244,7 +252,7 @@ const SignUp = () => {
                 : null
             }
             `}
-            placeholder="+26599"
+            placeholder="997216715"
             required
             autoComplete="off"
             onChange={(text) => {
@@ -255,7 +263,7 @@ const SignUp = () => {
                 lastNameErr: false,
                 phoneNumberErr: false,
               });
-              setPhoneNumber(text.target.value);
+              setPhoneNumber(text);
             }}
           />
         </div>
@@ -314,12 +322,16 @@ const SignUp = () => {
               required
             />
           </div>
-          <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+          <label className="ml-2 text-sm font-medium text-gray-700 ">
             I have accepted the
-            <span className="text-brightRedLight underline">Terms of use</span>
+            <span className="text-brightRedLight underline cursor-pointer">
+              {" "}
+              Terms of use{" "}
+            </span>
             and
-            <span className="text-brightRedLight underline">
-              privacy policy
+            <span className="text-brightRedLight underline cursor-pointer">
+              {" "}
+              privacy policy{" "}
             </span>
           </label>
         </div>
@@ -376,6 +388,14 @@ const SignUp = () => {
                   lastNameErr: false,
                   phoneNumberErr: false,
                 });
+              } else if (!phoneNumber) {
+                setErrorState({
+                  emailError: false,
+                  passwordErr: false,
+                  firstNameErr: false,
+                  lastNameErr: false,
+                  phoneNumberErr: true,
+                });
               } else if (phoneNumber === "") {
                 setErrorState({
                   emailError: false,
@@ -384,7 +404,7 @@ const SignUp = () => {
                   lastNameErr: false,
                   phoneNumberErr: true,
                 });
-              } else if (phoneNumber.length < 10) {
+              } else if (phoneNumber.length < 9) {
                 setErrorState({
                   emailError: false,
                   passwordErr: false,
@@ -409,12 +429,31 @@ const SignUp = () => {
                   phoneNumberErr: false,
                 });
               } else {
-                console.log("Hello World");
                 let createUserData = await createUser({
-                  input: { firstName, lastName, email, phoneNumber, password },
+                  input: {
+                    firstName,
+                    lastName,
+                    email,
+                    phoneNumber: phoneNumber.substring(1),
+                    password,
+                  },
                 });
 
-                console.log(createUserData);
+                if (createUserData.createUser) {
+                  if (createUserData.createUser.status) {
+                    notify.success(createUserData.createUser.message);
+
+                    setTimeout(() => {
+                      loginTab({
+                        ...loginTabState,
+                        login: true,
+                        createAccount: false,
+                      });
+                    }, 3000);
+                  } else {
+                    notify.fail(createUserData.createUser.message);
+                  }
+                }
               }
             }}
           >
@@ -422,6 +461,8 @@ const SignUp = () => {
           </button>
         </div>
       </form>
+
+      <ToastContainer />
     </div>
   );
 };

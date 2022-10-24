@@ -6,6 +6,8 @@ import google from "../../images/google.svg";
 import SignUp from "./Signup";
 import { LOGIN } from "../../Graphql/mutations";
 import { useGQLMutation } from "../../hooks/useGqlMutations";
+import { ToastContainer } from "react-toastify";
+import { notify } from "../../helper/notification";
 
 const Login = () => {
   const [tabState, changeStabState] = useState({
@@ -18,7 +20,7 @@ const Login = () => {
       {tabState.login ? (
         <UserLogin />
       ) : tabState.createAccount ? (
-        <SignUp />
+        <SignUp loginTab={changeStabState} loginTabState={tabState} />
       ) : null}
       {tabState.login ? (
         <button
@@ -127,8 +129,8 @@ const UserLogin = () => {
           <input
             type="email"
             value={email}
-            className="
-              shadow
+            className={`
+            shadow
             appearance-none
             border
             rounded
@@ -138,7 +140,15 @@ const UserLogin = () => {
             text-gray-500
             leading-tight
             focus:outline-none focus:shadow-outline
-              "
+
+            ${
+              errorState.emailError
+                ? ` border-solid
+            border-red-500
+              border-3`
+                : null
+            }
+            `}
             placeholder="name@filevert.com"
             required
             onChange={(text) => {
@@ -166,7 +176,8 @@ const UserLogin = () => {
               type="password"
               id="password"
               value={password}
-              className="shadow
+              className={`
+              shadow
             appearance-none
             border
             rounded
@@ -175,7 +186,17 @@ const UserLogin = () => {
             px-3
             text-gray-500
             leading-tight
-            focus:outline-none focus:shadow-outline"
+            focus:outline-none focus:shadow-outline
+
+
+            ${
+              errorState.passwordErr
+                ? ` border-solid
+            border-red-500
+              border-3`
+                : null
+            }
+              `}
               placeholder="**********"
               required
               onChange={(text) => {
@@ -237,17 +258,23 @@ const UserLogin = () => {
                     "Password should not be less than 6 characters",
                 });
               } else {
-                // console.log("about to login user");
-
                 let userLogIn = await userLogin({
                   email: email,
                   password: password,
                 });
 
                 if (userLogIn.userLogin) {
-                  console.log(userLogIn);
+                  if (userLogIn.userLogin.response.status) {
+                    console.log(userLogIn.userLogin);
+                  } else {
+                    setEmail("");
+                    setPassword("");
+                    notify.fail("Invalid email or password.");
+                  }
                 } else {
-                  console.log("user authentication failed");
+                  setEmail("");
+                  setPassword("");
+                  notify.fail("Invalid email or password.");
                 }
               }
             }}
@@ -256,6 +283,8 @@ const UserLogin = () => {
           </button>
         </div>
       </form>
+
+      <ToastContainer />
     </div>
   );
 };

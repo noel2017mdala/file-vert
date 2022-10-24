@@ -19,14 +19,12 @@ const rootResolver = {
   },
 
   createUser: ({ input }) => {
-    console.log(input);
-    return;
     if (input) {
       return createUser(input);
     }
     return {
       status: false,
-      message: "Failed to create user demo",
+      message: "Failed to create user",
     };
   },
 

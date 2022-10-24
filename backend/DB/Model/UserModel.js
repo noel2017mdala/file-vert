@@ -34,26 +34,26 @@ const createUser = async (userData) => {
         createUser = await createUser.save();
 
         if (createUser) {
-          sendMail(
-            createUser.email,
-            "Welcome to File-vert",
-            "test Mail",
-            createUser.firstName
-          );
+          // sendMail(
+          //   createUser.email,
+          //   "Welcome to File-vert",
+          //   "test Mail",
+          //   createUser.firstName
+          // );
           return {
             status: true,
-            message: "User creates successfully",
+            message: "User created successfully",
           };
         } else {
           return {
             status: false,
-            message: "Failed to create user wawa 2",
+            message: "Failed to create user",
           };
         }
       } catch (error) {
         return {
           status: false,
-          message: "Failed to create user wawa 3",
+          message: "Failed to create user",
         };
       }
     } else {
@@ -66,7 +66,7 @@ const createUser = async (userData) => {
   } else {
     return {
       status: false,
-      message: "Failed to create user wawa 1",
+      message: "Failed to create user",
     };
   }
 };

@@ -37,7 +37,7 @@ input UserInput{
     firstName: String,
     lastName: String,
     email: String,
-    phoneNumber: Int,
+    phoneNumber: String,
     password: String
 }
 `);
