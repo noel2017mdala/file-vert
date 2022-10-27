@@ -10,7 +10,7 @@ const Cta = () => {
 
         <div className="">
           <Link
-            to="/ge-started"
+            to="/get-started"
             className="p-3 px-6 pt-2 text-brightRed bg-white rounded-full font-bold shadow-2xl hover:bg-gray-300"
           >
             Get started

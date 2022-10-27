@@ -8,3 +8,11 @@ export const GET_USERS = gql`
     }
   }
 `;
+
+export const GET_USER = gql`
+  query ($id: ID) {
+    getUser(id: $id) {
+      firstName
+    }
+  }
+`;

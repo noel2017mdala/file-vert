@@ -8,7 +8,7 @@ export const useGQLMutation = (query, configs = {}) => {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      // Authorization: `Bearer ${userToken}`,
+      // Authorization: `Bearer ${userToken}`,`
     },
   };
 

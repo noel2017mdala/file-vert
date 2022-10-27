@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import emailValidator from "../../helper/emailValidator";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import file from "../../images/file.png";
 import google from "../../images/google.svg";
 import SignUp from "./Signup";
 import { LOGIN } from "../../Graphql/mutations";
 import { useGQLMutation } from "../../hooks/useGqlMutations";
+import { GET_USER } from "../../Graphql/queries";
+import { useGQLQuery } from "../../hooks/useGqlQueries";
 import { ToastContainer } from "react-toastify";
 import { notify } from "../../helper/notification";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const [tabState, changeStabState] = useState({
@@ -66,19 +69,26 @@ const UserLogin = () => {
     passwordErrMsg: "",
   });
 
-  const { mutateAsync: userLogin } = useGQLMutation(LOGIN, {
-    onSuccess: () => {
-      // console.log("user is ready to be logged in");
-    },
-  });
+  const { userAuthLogin, currentUser } = useAuth();
+
+  const navigate = useNavigate();
+
+  const { data, isLoading, error, refetch } = useGQLQuery(
+    "get_user",
+    GET_USER,
+    { id: "6358f9826d0e20fdd55a80ec" },
+    {
+      enabled: false,
+    }
+  );
+
   return (
     <div className="">
       <div className="flex flex-col space-y-4">
         <div className="flex space-x-4">
           <img src={file} alt="file" className="w-8 h-8" />
-          {/* <p className="text-2xl hover:text-darkGrayishBlue">File-vert</p> */}
           <Link
-            to="/ge-started"
+            to="/get-started"
             className="text-2xl hover:text-darkGrayishBlue"
           >
             File-vert
@@ -209,7 +219,14 @@ const UserLogin = () => {
                 setPassword(text.target.value);
               }}
             />
-            <button type="reset" className="w-max p-3 -mr-3">
+            <button
+              type="reset"
+              className="w-max p-3 -mr-3"
+              onClick={async () => {
+                let userData = await refetch();
+                console.log(userData.data.getUser);
+              }}
+            >
               <span className="text-sm tracking-wide text-blue-600">
                 Forgot password ?
               </span>
@@ -236,7 +253,6 @@ const UserLogin = () => {
                   passwordErrMsg: "Please enter your password",
                 });
               } else if (email === "") {
-                console.log("here");
                 setErrorState({
                   emailError: true,
                   emailErrMsg: "Please enter your email",
@@ -258,23 +274,22 @@ const UserLogin = () => {
                     "Password should not be less than 6 characters",
                 });
               } else {
-                let userLogIn = await userLogin({
-                  email: email,
-                  password: password,
-                });
+                try {
+                  const getUserAuth = await userAuthLogin(email, password);
 
-                if (userLogIn.userLogin) {
-                  if (userLogIn.userLogin.response.status) {
-                    console.log(userLogIn.userLogin);
+                  if (getUserAuth) {
+                    setEmail("");
+                    setPassword("");
+                    navigate("/dashboard");
                   } else {
                     setEmail("");
                     setPassword("");
                     notify.fail("Invalid email or password.");
                   }
-                } else {
+                } catch (error) {
                   setEmail("");
                   setPassword("");
-                  notify.fail("Invalid email or password.");
+                  notify.fail("Failed to login.");
                 }
               }
             }}

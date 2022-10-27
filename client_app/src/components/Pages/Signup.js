@@ -39,7 +39,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
           <img src={file} alt="file" className="w-8 h-8" />
           {/* <p className="text-2xl hover:text-darkGrayishBlue">File-vert</p> */}
           <Link
-            to="/ge-started"
+            to="/get-started"
             className="text-2xl hover:text-darkGrayishBlue"
           >
             File-vert

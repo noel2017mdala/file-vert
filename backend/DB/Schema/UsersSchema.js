@@ -27,6 +27,10 @@ const User = new Schema({
     required: true,
   },
 
+  userRefreshToken: {
+    type: Object,
+  },
+
   dateCreated: {
     type: Date,
     default: Date.now,

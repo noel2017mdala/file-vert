@@ -5,6 +5,8 @@ const User = mongoose.model("User", UserSchema);
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../../helper/emailSender");
+const { generateRefreshToken } = require("../../helper/generateAccessToken");
+const { getTime } = require("../../helper/getTime");
 
 const createUser = async (userData) => {
   //destracture the userData input
@@ -89,16 +91,40 @@ const login = async (userData) => {
           },
           getSecret,
           {
-            expiresIn: "3w",
+            expiresIn: "15m",
+          }
+        );
+
+        const refreshToken = await generateRefreshToken(getUser._id);
+
+        await User.findByIdAndUpdate(
+          getUser._id,
+          {
+            userRefreshToken: {
+              refreshToken,
+              lastRefresh: getTime(),
+            },
+          },
+          {
+            new: true,
           }
         );
 
         return {
           user: getUser,
           token,
+          refreshToken: refreshToken,
           response: {
             status: true,
             message: "Login successful",
+          },
+        };
+      } else {
+        return {
+          user: {},
+          response: {
+            status: false,
+            message: "Login failed",
           },
         };
       }
@@ -124,7 +150,17 @@ const login = async (userData) => {
   }
 };
 
+const getUserData = async (userId) => {
+  if (userId && userId !== "") {
+    let getUserData = await User.findById(userId);
+    if (getUserData) {
+      return getUserData;
+    }
+  }
+};
+
 module.exports = {
   createUser,
   login,
+  getUserData,
 };

@@ -6,8 +6,10 @@ export const LOGIN = gql`
       user {
         firstName
         lastName
+        id
       }
-      token
+      # token
+      #refreshToken
       response {
         status
         message

@@ -26,7 +26,7 @@ const HeroSection = () => {
 
           <div className="flex justify-center md:justify-start">
             <Link
-              to="/ge-started"
+              to="/get-started"
               className="p-3 px-6 pt-2 text-white bg-brightRed rounded-full font-bold hover:bg-brightRedLight"
             >
               Get started

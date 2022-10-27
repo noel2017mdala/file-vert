@@ -4,6 +4,8 @@ const { graphqlHTTP } = require("express-graphql");
 const connection = require("./DB/connection");
 const schema = require("./graphql/Schema");
 const rootResolver = require("./graphql/Resolver");
+const cookieParser = require("cookie-parser");
+
 const app = express();
 const port = process.env.PORT || 8000;
 
@@ -17,7 +19,7 @@ app.use(
     credentials: true,
   })
 );
-
+app.use(cookieParser());
 app.use(morgan("tiny"));
 // app.get("/", (req, res) => {
 //   res
@@ -27,14 +29,32 @@ app.use(morgan("tiny"));
 //     .status(200);
 // });
 
-app.use(
-  "/graphql",
-  graphqlHTTP({
+app.get("/test-cookies", (req, res) => {
+  res.cookie("name-new", "abel Mdala", {
+    httpOnly: true,
+    secure: true,
+    path: "/",
+    sameSite: "none",
+    domain: "localhost:3000",
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  });
+  // console.log(res);
+  res.send("cookies sent");
+  
+});
+
+
+app.use("/graphql", (req, res) => {
+  return graphqlHTTP({
     schema,
     graphiql: process.env.NODE_ENV === "development",
     rootValue: rootResolver,
-  })
-);
+    context: {
+      request: { req, res },
+      test: "Hello World",
+    },
+  })(req, res);
+});
 connection((conResult) => {
   console.log(conResult);
 });

@@ -17,19 +17,22 @@ type Response{
 
 type LoginResponse {
     user: User,
-    token: String,
-    response: Response
+    # token: String,
+    response: Response,
+    # refreshToken: String.
+    id: ID
 }
 
 type Query{
     getUser(id: ID): User,
-    getUsers: [User],
+   # getUsers: [User],
 }
 
 
 type Mutation{
     createUser(input: UserInput): Response,
     userLogin(email: String, password: String): LoginResponse,
+    
 }
 
 
