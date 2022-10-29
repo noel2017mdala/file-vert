@@ -5,6 +5,7 @@ const connection = require("./DB/connection");
 const schema = require("./graphql/Schema");
 const rootResolver = require("./graphql/Resolver");
 const cookieParser = require("cookie-parser");
+const demoMiddleWare = require("./middleware/demoMiddleWare");
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -21,28 +22,6 @@ app.use(
 );
 app.use(cookieParser());
 app.use(morgan("tiny"));
-// app.get("/", (req, res) => {
-//   res
-//     .send({
-//       message: "Hello User",
-//     })
-//     .status(200);
-// });
-
-app.get("/test-cookies", (req, res) => {
-  res.cookie("name-new", "abel Mdala", {
-    httpOnly: true,
-    secure: true,
-    path: "/",
-    sameSite: "none",
-    domain: "localhost:3000",
-    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  });
-  // console.log(res);
-  res.send("cookies sent");
-  
-});
-
 
 app.use("/graphql", (req, res) => {
   return graphqlHTTP({

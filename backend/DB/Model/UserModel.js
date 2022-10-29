@@ -5,7 +5,10 @@ const User = mongoose.model("User", UserSchema);
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../../helper/emailSender");
-const { generateRefreshToken } = require("../../helper/generateAccessToken");
+const {
+  generateRefreshToken,
+  validateRefreshToken,
+} = require("../../helper/generateAccessToken");
 const { getTime } = require("../../helper/getTime");
 
 const createUser = async (userData) => {
@@ -159,8 +162,47 @@ const getUserData = async (userId) => {
   }
 };
 
+const refreshToken = async (id, refreshToken) => {
+  if (id) {
+    let getUser = await User.findOne({ _id: id });
+    if (getUser) {
+      let getUserRefreshToken = getUser.userRefreshToken.refreshToken;
+      if (getUserRefreshToken === refreshToken) {
+        const getToken = await validateRefreshToken(id, getUserRefreshToken);
+        return getToken;
+      } else {
+        return {
+          response: {
+            status: false,
+            message: "failed to get token",
+          },
+          token: null,
+        };
+      }
+      // console.log(getUserRefreshToken);
+    } else {
+      return {
+        response: {
+          status: false,
+          message: "failed to get token",
+        },
+        token: null,
+      };
+    }
+  } else {
+    return {
+      response: {
+        status: false,
+        message: "failed to get token",
+      },
+      token: null,
+    };
+  }
+};
+
 module.exports = {
   createUser,
   login,
   getUserData,
+  refreshToken,
 };

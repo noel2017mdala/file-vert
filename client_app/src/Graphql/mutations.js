@@ -8,7 +8,7 @@ export const LOGIN = gql`
         lastName
         id
       }
-      # token
+      token
       #refreshToken
       response {
         status
@@ -25,4 +25,16 @@ export const CREATE_ACCOUNT = gql`
       message
     }
   }
+`;
+
+export const TOKEN_REFRESH = gql`
+mutation($id: ID){
+  tokenRefresh(id: $id){
+    token
+    response {
+        status
+        message
+      }
+  }
+}
 `;
