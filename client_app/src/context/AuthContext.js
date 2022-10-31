@@ -44,8 +44,9 @@ export const AuthProvider = ({ children }) => {
       if (userAuthData) {
         let checkRefreshToken = await tokenRefresh({ id: userAuthData });
 
-        const { response, token } = checkRefreshToken.tokenRefresh;
+        const { response, token } = checkRefreshToken.tokenRefresh; 
         if (response.status && userAuth) {
+           
           setUserToken(token);
           setCurrentUser(JSON.parse(userAuth));
           navigate("/dashboard");

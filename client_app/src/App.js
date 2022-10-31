@@ -16,9 +16,6 @@ import "./styles/Main.css";
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
-  // useEffect(() => {
-  //   console.log("wawa2");
-  // }, []);
   return (
     <AuthProvider>
       <div className="main">
