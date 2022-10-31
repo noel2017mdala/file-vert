@@ -4,7 +4,7 @@ import userProfile from "../../images/userProfile.jpeg";
 import files_dashboard from "../../images/files_dashboard.svg";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
-const Sidebar = () => {
+const Sidebar = ({ state, changeState }) => {
   const { currentUser } = useAuth();
   const [openSideBar, setOpenSideBar] = useState(false);
   return (
@@ -65,8 +65,23 @@ const Sidebar = () => {
               </div>
             </li> */}
 
-            <li>
-              <p className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer">
+            <li
+              onClick={() => {
+                changeState({
+                  dashboard: true,
+                  messages: false,
+                  notifications: false,
+                  files: false,
+                  profile: false,
+                  settings: false,
+                });
+              }}
+            >
+              <p
+                className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer ${
+                  state.dashboard ? "bg-gray-50 border-brightRed" : ""
+                }`}
+              >
                 <span className="inline-flex justify-center items-center ml-4">
                   <svg
                     className="w-5 h-5"
@@ -93,8 +108,23 @@ const Sidebar = () => {
               </p>
             </li>
 
-            <li>
-              <p className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer">
+            <li
+              onClick={() => {
+                changeState({
+                  dashboard: false,
+                  messages: true,
+                  notifications: false,
+                  files: false,
+                  profile: false,
+                  settings: false,
+                });
+              }}
+            >
+              <p
+                className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer ${
+                  state.messages ? "bg-gray-50 border-brightRed" : ""
+                }`}
+              >
                 <span className="inline-flex justify-center items-center ml-4">
                   <svg
                     className="w-5 h-5"
@@ -126,8 +156,23 @@ const Sidebar = () => {
               </p>
             </li>
 
-            <li>
-              <p className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer">
+            <li
+              onClick={() => {
+                changeState({
+                  dashboard: false,
+                  messages: false,
+                  notifications: true,
+                  files: false,
+                  profile: false,
+                  settings: false,
+                });
+              }}
+            >
+              <p
+                className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer ${
+                  state.notifications ? "bg-gray-50 border-brightRed" : ""
+                }`}
+              >
                 <span className="inline-flex justify-center items-center ml-4">
                   <svg
                     className="w-5 h-5"
@@ -159,10 +204,25 @@ const Sidebar = () => {
               </p>
             </li>
 
-            <li>
-              <p className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer">
+            <li
+              onClick={() => {
+                changeState({
+                  dashboard: false,
+                  messages: false,
+                  notifications: false,
+                  files: true,
+                  profile: false,
+                  settings: false,
+                });
+              }}
+            >
+              <p
+                className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer ${
+                  state.files ? "bg-gray-50 border-brightRed" : ""
+                }`}
+              >
                 <span className="inline-flex justify-center items-center ml-4">
-                  <img src={files_dashboard} width="28" height="28" />
+                  <img src={files_dashboard} width="24" height="24" />
                 </span>
 
                 <span
@@ -175,8 +235,23 @@ const Sidebar = () => {
               </p>
             </li>
 
-            <li>
-              <p className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer">
+            <li
+              onClick={() => {
+                changeState({
+                  dashboard: false,
+                  messages: false,
+                  notifications: false,
+                  files: false,
+                  profile: true,
+                  settings: false,
+                });
+              }}
+            >
+              <p
+                className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer ${
+                  state.profile ? "bg-gray-50 border-brightRed" : ""
+                }`}
+              >
                 <span className="inline-flex justify-center items-center ml-4">
                   <svg
                     className="w-5 h-5"
@@ -203,8 +278,24 @@ const Sidebar = () => {
                 </span>
               </p>
             </li>
-            <li>
-              <p className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer">
+
+            <li
+              onClick={() => {
+                changeState({
+                  dashboard: false,
+                  messages: false,
+                  notifications: false,
+                  files: false,
+                  profile: false,
+                  settings: true,
+                });
+              }}
+            >
+              <p
+                className={`relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer ${
+                  state.settings ? "bg-gray-50 border-brightRed" : ""
+                }`}
+              >
                 <span className="inline-flex justify-center items-center ml-4">
                   <svg
                     className="w-5 h-5"

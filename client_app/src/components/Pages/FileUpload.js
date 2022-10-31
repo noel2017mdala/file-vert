@@ -70,7 +70,7 @@ const GetStarted = () => {
             {files !== undefined ? (
               <div className="w-2/4 h-12 flex flex-col  items-center justify-center space-y-6 md:flex-row md:space-x-8 md:space-y-0">
                 <div className="w-6/12">
-                  <p className="text-ellipsis overflow-hidden">
+                  <p className="text-sm tracking-wide truncate">
                     {files.map((file) => file.name)}
                   </p>
                 </div>
