@@ -28,10 +28,17 @@ type TokenResponse {
     response: Response
 }
 
+type convertFormat {
+    format: [String],
+    response: Response
+}
+
 type Query{
     getUser(id: ID): User,
+    getFormats(id: ID, format: String): convertFormat
    # getUsers: [User],
 }
+
 
 
 type Mutation{

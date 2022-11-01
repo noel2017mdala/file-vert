@@ -3,6 +3,7 @@ const {
   login,
   getUserData,
   refreshToken,
+  getUserFormats,
 } = require("../DB/Model/UserModel");
 const { AddDays } = require("../helper/getTime");
 const data = [
@@ -107,6 +108,13 @@ const rootResolver = {
         },
         token: null,
       };
+    }
+  },
+
+  getFormats: async ({ id, format }, args, context) => {
+    if (id && format) {
+      let userFormats = await getUserFormats(id, format);
+      return userFormats;
     }
   },
 };

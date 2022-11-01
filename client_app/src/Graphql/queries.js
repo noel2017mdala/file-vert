@@ -16,3 +16,14 @@ export const GET_USER = gql`
     }
   }
 `;
+
+export const GET_FORMATS = gql`
+  query ($id: ID, $format: String) {
+    getFormats(id: $id, format: $format) {
+      format
+      response {
+        status
+      }
+    }
+  }
+`;

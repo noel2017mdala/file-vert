@@ -20,15 +20,10 @@ const Sidebar = ({ state, changeState }) => {
             setOpenSideBar(!openSideBar);
           }}
         >
-          {/* <img
-            src={openSideBar ? back_previous_arrow : forward_pointer}
-            className=""
-          /> */}
-
           {openSideBar ? (
-            <MdArrowBack color="F6866A" />
+            <MdArrowBack color="F6866A" size={25}/>
           ) : (
-            <MdArrowForward color="F6866A" />
+            <MdArrowForward color="F6866A" size={25}/>
           )}
         </div>
         <div className="flex items-center justify-center  border-b  md:my-0 ">
@@ -57,14 +52,6 @@ const Sidebar = ({ state, changeState }) => {
 
         <div className="overflow-y-auto overflow-x-hidden flex-grow mt-6">
           <ul className="flex flex-col py-4 space-y-1">
-            {/* <li className="px-5">
-              <div className="flex flex-row items-center h-8">
-                <div className="text-sm font-light tracking-wide text-gray-500">
-                  Menu
-                </div>
-              </div>
-            </li> */}
-
             <li
               onClick={() => {
                 changeState({

@@ -200,9 +200,72 @@ const refreshToken = async (id, refreshToken) => {
   }
 };
 
+const getUserFormats = (id, format) => {
+  if (id && format) {
+    if (format === "pdf") {
+      return {
+        format: ["doc", "ppt", "csv", "png", "jpg"],
+        response: {
+          status: true,
+          message: "file extension",
+        },
+      };
+    } else if (format === "jpg") {
+      return {
+        format: ["doc", "pdf", "png"],
+        response: {
+          status: true,
+          message: "file extension",
+        },
+      };
+    } else if (format === "png") {
+      return {
+        format: ["jpg", "doc", "pdf"],
+        response: {
+          status: true,
+          message: "file extension",
+        },
+      };
+    } else if (format === "svg") {
+      return {
+        format: ["jpg", "png", "pdf"],
+        response: {
+          status: true,
+          message: "file extension",
+        },
+      };
+    } else if (format === "epub") {
+      return {
+        format: ["pdf"],
+        response: {
+          status: true,
+          message: "file extension",
+        },
+      };
+    } else if (format === "jpeg") {
+      return {
+        format: ["png", "doc", "pdf"],
+        response: {
+          status: true,
+          message: "file extension",
+        },
+      };
+    } else {
+      return {
+        response: {
+          status: false,
+          message: "failed to get file extensions",
+        },
+        format: null,
+      };
+    }
+  }
+};
+
 module.exports = {
   createUser,
   login,
   getUserData,
   refreshToken,
+  getUserFormats,
 };

@@ -1,17 +1,19 @@
 import React, { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import fileUpload from "../../images/172620_upload_icon.png";
+import { GET_FORMATS } from "../../Graphql/queries";
+import { useGQLQuery } from "../../hooks/useGqlQueries";
+import { useAuth } from "../../context/AuthContext";
+import ClipLoader from "react-spinners/ClipLoader";
+import { css } from "@emotion/react";
 const GetStarted = () => {
   const [files, setFiles] = useState();
   const [dropDown, toggleDropdown] = useState(false);
-  const [convertTypes, setConvertTypes] = useState([
-    "Dashboard",
-    "Settings",
-    "Earnings",
-    "Sign out",
-  ]);
+  const [convertTypes, setConvertTypes] = useState([]);
 
+  const [extensionName, setExtensionName] = useState("");
   const [convertName, setConvertName] = useState("Convert to");
+  const [loaderState, setLoaderState] = useState(false);
   // const [getRootProps, getInputProps] = useDropzone({
   //   accept: "image/*",
   //   onDrop: (acceptedFiles) => {
@@ -25,10 +27,45 @@ const GetStarted = () => {
   //   },
   // });
 
-  const onDrop = useCallback((acceptedFiles) => {
-    setFiles(acceptedFiles);
+  const { currentUser } = useAuth();
+  const { data, isLoading, error, refetch } = useGQLQuery(
+    "get_formats",
+    GET_FORMATS,
+    { id: currentUser.user.id, format: extensionName },
+    {
+      enabled: false,
+    }
+  );
+
+  const onDrop = useCallback(async (acceptedFiles) => {
+    setLoaderState(true);
+    let newText = acceptedFiles[0].name;
+    let fileFormat = newText.slice(
+      (Math.max(0, newText.lastIndexOf(".")) || Infinity) + 1
+    );
+    if (fileFormat) {
+      setExtensionName(fileFormat);
+      setTimeout(async () => {
+        let fileExt = await refetch();
+        if (fileExt.data.getFormats.response.status) {
+          setConvertTypes(fileExt.data.getFormats.format);
+          setFiles(acceptedFiles);
+        } else {
+          setFiles(undefined);
+        }
+        setLoaderState(false);
+      }, 1000);
+    } else {
+      setLoaderState(false);
+    }
+
     // Do something with the files
   }, []);
+
+  const override = css`
+    display: block;
+    border-color: #00bfa5;
+  `;
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
   return (
@@ -140,7 +177,16 @@ const GetStarted = () => {
                 });
               }}
             >
-              Convert
+              {loaderState ? (
+                <ClipLoader
+                  color="#FFFFFF"
+                  css={override}
+                  size={15}
+                  className=""
+                />
+              ) : (
+                "Convert"
+              )}
             </button>
           </div>
         </div>

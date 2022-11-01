@@ -8,7 +8,7 @@ const Notification = () => {
         <img src={notification} className="h-2/4 w-2/4" />
 
         <h3 className="font-bold text-sm md:text-xl text-brightRedLight">
-          Oops no Notifications found
+          Oops no notifications found
         </h3>
       </div>
     </div>
