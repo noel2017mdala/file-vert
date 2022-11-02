@@ -27,3 +27,9 @@ export const GET_FORMATS = gql`
     }
   }
 `;
+
+export const FETCH_DATA = gql`
+query{
+  fetchData
+}
+`

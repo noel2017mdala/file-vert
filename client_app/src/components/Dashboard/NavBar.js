@@ -137,7 +137,7 @@ const Navbar = () => {
         )}
 
         {openNotifications ? (
-          <div className="hidden md:block absolute top-12 right-16 z-10">
+          <div className="hidden md:block absolute top-16 right-16 z-10">
             <div
               id="dropdownNotification"
               className=" z-20 w-full max-w-sm bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-800 dark:divide-gray-700"

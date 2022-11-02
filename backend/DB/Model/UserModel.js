@@ -4,6 +4,8 @@ const UserSchema = require("../Schema/UsersSchema");
 const User = mongoose.model("User", UserSchema);
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
+const request = require("request");
 const sendMail = require("../../helper/emailSender");
 const {
   generateRefreshToken,
@@ -262,10 +264,75 @@ const getUserFormats = (id, format) => {
   }
 };
 
+const testAxios = async () => {
+  // let data = await axios.get(
+  //   "https://sandbox.zamzar.com/v1/formats/gif",
+  //   {},
+  //   {
+  //     auth: {
+  //       username: "558686f9377507c05f3d7845b80d64a364578227",
+  //       password: "",
+  //     },
+  //   }
+  // );
+
+  // console.log(data);
+
+  let url = "https://sandbox.zamzar.com/v1/formats/mp4";
+  let data = await axios({
+    method: "get",
+    url,
+    auth: {
+      username: "558686f9377507c05f3d7845b80d64a364578227",
+      password: "",
+    },
+  });
+
+  console.log(data.data);
+};
+
+const uploadFileConvert = async (path, ext, cb) => {
+  let formData = {
+    target_format: ext,
+    source_file: fs.createReadStream(path),
+  };
+
+  // let url = "https://sandbox.zamzar.com/v1/jobs/";
+  // let data = await axios({
+  //   method: "post",
+  //   url,
+  //   auth: {
+  //     username: "558686f9377507c05f3d7845b80d64a364578227",
+  //     password: "",
+  //   },
+  //   data: {
+  //     formData: formData,
+  //   },
+  // });
+
+  // console.log(data);
+
+  request
+    .post(
+      { url: "https://sandbox.zamzar.com/v1/jobs/", formData: formData },
+      function (err, response, body) {
+        if (err) {
+          cb({ response: err, status: false });
+        } else {
+          let response = JSON.parse(body);
+          cb({ response, status: true });
+        }
+      }
+    )
+    .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
+};
+
 module.exports = {
   createUser,
   login,
   getUserData,
   refreshToken,
   getUserFormats,
+  testAxios,
+  uploadFileConvert,
 };

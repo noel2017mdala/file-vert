@@ -1,11 +1,14 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import fileUpload from "../../images/172620_upload_icon.png";
-import { GET_FORMATS } from "../../Graphql/queries";
+import { GET_FORMATS, FETCH_DATA } from "../../Graphql/queries";
 import { useGQLQuery } from "../../hooks/useGqlQueries";
 import { useAuth } from "../../context/AuthContext";
 import ClipLoader from "react-spinners/ClipLoader";
+import axios from "axios";
 import { css } from "@emotion/react";
+import { notify } from "../../helper/notification";
+import { ToastContainer } from "react-toastify";
 const GetStarted = () => {
   const [files, setFiles] = useState();
   const [dropDown, toggleDropdown] = useState(false);
@@ -14,6 +17,7 @@ const GetStarted = () => {
   const [extensionName, setExtensionName] = useState("");
   const [convertName, setConvertName] = useState("Convert to");
   const [loaderState, setLoaderState] = useState(false);
+  const { currentUser, socket } = useAuth();
   // const [getRootProps, getInputProps] = useDropzone({
   //   accept: "image/*",
   //   onDrop: (acceptedFiles) => {
@@ -27,11 +31,71 @@ const GetStarted = () => {
   //   },
   // });
 
-  const { currentUser } = useAuth();
+  useEffect(() => {
+    socket.on("file-download", (data) => {
+      console.log(data);
+    });
+  }, [socket]);
+
   const { data, isLoading, error, refetch } = useGQLQuery(
     "get_formats",
     GET_FORMATS,
     { id: currentUser.user.id, format: extensionName },
+    {
+      enabled: false,
+    }
+  );
+
+  const uploadFiles = (files) => {
+    if (files && convertName !== "Convert to" && convertName !== "") {
+      setLoaderState(true);
+      const formData = new FormData();
+      formData.append("description", "file conversion");
+      formData.append("fileFormat", convertName);
+      formData.append("file", files);
+
+      axios
+        .put(` http://localhost:8000/upload`, formData)
+        .then((res) => {
+          // console.log(res.data);
+          if (res.data.status) {
+            notify.success(
+              "you file is being converted you will be notified once done "
+            );
+            setLoaderState(false);
+            setFiles(undefined);
+          } else {
+            notify.fail("failed to convert your file please try again later");
+            setLoaderState(false);
+            setFiles(undefined);
+          }
+        })
+        .catch((err) => {
+          notify.fail("failed to convert your file please try again later");
+          setLoaderState(false);
+          setFiles(undefined);
+        });
+    }
+  };
+
+  // const {
+  //   data: userData,
+  //   isLoading: loading,
+  //   error: userErr,
+  //   refetch: dataRefetch,
+  // } = useGQLQuery("fetch_data", FETCH_DATA, {
+  //   enabled: false,
+  // });
+
+  const {
+    data: userData,
+    isLoading: loading,
+    error: userErr,
+    refetch: dataRefetch,
+  } = useGQLQuery(
+    "fetch_data",
+    FETCH_DATA,
+    { id: currentUser.user.id },
     {
       enabled: false,
     }
@@ -86,7 +150,7 @@ const GetStarted = () => {
                 <div className="flex flex-col items-center justify-center space-y-4 my-8">
                   <img src={fileUpload} className="w-1/5 h-1/5" />
 
-                  <input {...getInputProps()} />
+                  <input {...getInputProps()} name="file" />
                   {isDragActive ? (
                     <p>Drop the files here ...</p>
                   ) : (
@@ -168,13 +232,24 @@ const GetStarted = () => {
             <button
               className="p-3 px-6 pt-2 text-white bg-brightRed rounded-full font-bold hover:bg-brightRedLight"
               onClick={() => {
-                files.map((file) => {
-                  let text = file.name;
-                  let newText = text.split(".");
-                  if (newText) {
-                    console.log(newText);
-                  }
-                });
+                // files.map((file) => {
+                //   let text = file.name;
+                //   let newText = text.split(".");
+                //   if (newText) {
+                //     console.log(newText);
+                //   }
+                // });
+                // getFetchedData.refetch()
+
+                // const getUserFetch = dataRefetch();
+                // console.log(getUserFetch);
+
+                // console.log(files[0]);
+                if (files) {
+                  uploadFiles(files[0]);
+                } else {
+                  notify.fail("Please select a file to convert");
+                }
               }}
             >
               {loaderState ? (
@@ -191,6 +266,7 @@ const GetStarted = () => {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </section>
   );
 };

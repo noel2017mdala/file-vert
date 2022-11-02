@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
+import { io } from "socket.io-client";
 import { Link, useNavigate } from "react-router-dom";
 // import { useGQLQuery } from "../hooks/useGqlQueries";
 import { useGQLMutation } from "../hooks/useGqlMutations";
@@ -13,6 +14,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState();
   const [userToken, setUserToken] = useState(null);
+  const [userId, setUserId] = useState();
   const [loadingState, setLoadingState] = useState(true);
   const { mutateAsync: userLogin } = useGQLMutation(LOGIN, {
     onSuccess: () => {
@@ -31,11 +33,18 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const userAuth = window.localStorage.getItem("user_items");
     if (userAuth) {
+      let userId = JSON.parse(userAuth).user.id;
+      setUserId(userId);
       getUserToken();
     } else {
       setLoadingState(false);
     }
   }, []);
+
+  let socket = io(`http://localhost:8000`, {
+    transports: ["websocket"],
+    query: `userId=${!userId ? null : userId}`,
+  });
 
   const getUserToken = async () => {
     const userAuth = window.localStorage.getItem("user_items");
@@ -44,9 +53,8 @@ export const AuthProvider = ({ children }) => {
       if (userAuthData) {
         let checkRefreshToken = await tokenRefresh({ id: userAuthData });
 
-        const { response, token } = checkRefreshToken.tokenRefresh; 
+        const { response, token } = checkRefreshToken.tokenRefresh;
         if (response.status && userAuth) {
-           
           setUserToken(token);
           setCurrentUser(JSON.parse(userAuth));
           navigate("/dashboard");
@@ -93,6 +101,7 @@ export const AuthProvider = ({ children }) => {
     userToken,
     currentUser,
     userAuthLogin,
+    socket,
   };
   return loadingState ? (
     <p>Loading</p>

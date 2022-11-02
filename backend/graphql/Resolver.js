@@ -4,6 +4,7 @@ const {
   getUserData,
   refreshToken,
   getUserFormats,
+  testAxios,
 } = require("../DB/Model/UserModel");
 const { AddDays } = require("../helper/getTime");
 const data = [
@@ -116,6 +117,10 @@ const rootResolver = {
       let userFormats = await getUserFormats(id, format);
       return userFormats;
     }
+  },
+
+  fetchData: async ({}) => {
+    testAxios();
   },
 };
 
