@@ -17,6 +17,8 @@ const GetStarted = () => {
   const [extensionName, setExtensionName] = useState("");
   const [convertName, setConvertName] = useState("Convert to");
   const [loaderState, setLoaderState] = useState(false);
+  const [downloadButton, setDownloadButton] = useState(false);
+  const [downloadContent, setDownloadContent] = useState();
   const { currentUser, socket } = useAuth();
   // const [getRootProps, getInputProps] = useDropzone({
   //   accept: "image/*",
@@ -33,7 +35,8 @@ const GetStarted = () => {
 
   useEffect(() => {
     socket.on("file-download", (data) => {
-      console.log(data);
+      setDownloadButton(true);
+      setDownloadContent(data.result);
     });
   }, [socket]);
 
@@ -59,7 +62,7 @@ const GetStarted = () => {
         .then((res) => {
           // console.log(res.data);
           if (res.data.status) {
-            notify.success(
+            notify.successBottom(
               "you file is being converted you will be notified once done "
             );
             setLoaderState(false);
@@ -229,40 +232,54 @@ const GetStarted = () => {
             ) : (
               ""
             )}
-            <button
-              className="p-3 px-6 pt-2 text-white bg-brightRed rounded-full font-bold hover:bg-brightRedLight"
-              onClick={() => {
-                // files.map((file) => {
-                //   let text = file.name;
-                //   let newText = text.split(".");
-                //   if (newText) {
-                //     console.log(newText);
-                //   }
-                // });
-                // getFetchedData.refetch()
+            {downloadButton ? (
+              <a
+                onClick={() => {
+                  setDownloadButton(false);
+                  setDownloadContent({});
+                  setConvertName("Convert to");
+                }}
+                className="p-3 px-6 pt-2 text-white bg-brightRed rounded-full font-bold hover:bg-brightRedLight"
+                href={downloadContent.downloadLink}
+              >
+                download
+              </a>
+            ) : (
+              <button
+                className="p-3 px-6 pt-2 text-white bg-brightRed rounded-full font-bold hover:bg-brightRedLight"
+                onClick={() => {
+                  // files.map((file) => {
+                  //   let text = file.name;
+                  //   let newText = text.split(".");
+                  //   if (newText) {
+                  //     console.log(newText);
+                  //   }
+                  // });
+                  // getFetchedData.refetch()
 
-                // const getUserFetch = dataRefetch();
-                // console.log(getUserFetch);
+                  // const getUserFetch = dataRefetch();
+                  // console.log(getUserFetch);
 
-                // console.log(files[0]);
-                if (files) {
-                  uploadFiles(files[0]);
-                } else {
-                  notify.fail("Please select a file to convert");
-                }
-              }}
-            >
-              {loaderState ? (
-                <ClipLoader
-                  color="#FFFFFF"
-                  css={override}
-                  size={15}
-                  className=""
-                />
-              ) : (
-                "Convert"
-              )}
-            </button>
+                  // console.log(files[0]);
+                  if (files) {
+                    uploadFiles(files[0]);
+                  } else {
+                    notify.fail("Please select a file to convert");
+                  }
+                }}
+              >
+                {loaderState ? (
+                  <ClipLoader
+                    color="#FFFFFF"
+                    css={override}
+                    size={15}
+                    className=""
+                  />
+                ) : (
+                  "Convert"
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>

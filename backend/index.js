@@ -8,7 +8,11 @@ const schema = require("./graphql/Schema");
 const rootResolver = require("./graphql/Resolver");
 const cookieParser = require("cookie-parser");
 const demoMiddleWare = require("./middleware/demoMiddleWare");
-const { uploadFileConvert } = require("./DB/Model/UserModel");
+const {
+  uploadFileConvert,
+  getFileStatus,
+  downloadFile,
+} = require("./DB/Model/UserModel");
 
 const app = express();
 const http = require("http").createServer(app);
@@ -42,18 +46,31 @@ app.use(morgan("tiny"));
 
 app.put("/upload", upload.single("file"), async (req, res) => {
   const obj = JSON.parse(JSON.stringify(req.body));
-  // console.log(obj.fileFormat);
-  // console.log(req.file.path);
-  io.sockets.emit("file-download", {
-    message: "file ready for download",
-  });
-  res.send("done");
-  return;
+
   const convertFile = await uploadFileConvert(
     req.file.path,
     obj.fileFormat,
-    (result) => {
+    async (result) => {
       if (result.status) {
+        let processId = result.response.id;
+
+        let getConvertStatus = setInterval(async () => {
+          let getUploadStatus = await getFileStatus(processId);
+
+          if (getUploadStatus.status === "successful") {
+            const downloadedFile = await downloadFile(
+              getUploadStatus.target_files[0].id,
+              (result) => {
+                io.sockets.emit("file-download", {
+                  message: "file ready for download",
+                  result,
+                });
+                clearInterval(getConvertStatus);
+              }
+            );
+          }
+        }, 1000);
+
         res
           .json({
             response: result.response,
@@ -70,8 +87,6 @@ app.put("/upload", upload.single("file"), async (req, res) => {
       }
     }
   );
-  // console.log(convertFile);
-  // res.send("hello").status(200);
 });
 
 app.use("/graphql", (req, res) => {

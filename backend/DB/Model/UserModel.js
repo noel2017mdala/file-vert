@@ -327,6 +327,58 @@ const uploadFileConvert = async (path, ext, cb) => {
     .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
 };
 
+const getFileStatus = async (jobId) => {
+  console.log(jobId);
+  // var request = require("request"),
+  //   apiKey = "558686f9377507c05f3d7845b80d64a364578227";
+
+  // request
+  //   .get(
+  //     "https://sandbox.zamzar.com/v1/jobs/" + jobId,
+  //     function (err, response, body) {
+  //       if (err) {
+  //         console.error("Unable to get job", err);
+  //       } else {
+  //         console.log("SUCCESS! Got job:", JSON.parse(body));
+  //       }
+  //     }
+  //   )
+  //   .auth(apiKey, "", true);
+
+  let url = `https://sandbox.zamzar.com/v1/jobs/${jobId}`;
+  let data = await axios({
+    method: "get",
+    url,
+    auth: {
+      username: "558686f9377507c05f3d7845b80d64a364578227",
+      password: "",
+    },
+  });
+
+  // console.log(data.data);
+
+  return data.data;
+};
+
+const downloadFile = async (fileId, cb) => {
+  axios({
+    method: "get",
+    url: `https://sandbox.zamzar.com/v1/files/${fileId}/content`,
+    auth: {
+      username: "558686f9377507c05f3d7845b80d64a364578227",
+      password: "",
+    },
+    responseType: "stream",
+  }).then(function (response) {
+    // response.data.pipe(fs.createWriteStream());
+
+    cb({
+      status: true,
+      downloadLink: response.data.responseUrl,
+    });
+  });
+};
+
 module.exports = {
   createUser,
   login,
@@ -335,4 +387,6 @@ module.exports = {
   getUserFormats,
   testAxios,
   uploadFileConvert,
+  getFileStatus,
+  downloadFile,
 };

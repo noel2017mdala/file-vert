@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import file from "../../images/file.png";
 import userProfile from "../../images/userProfile.jpeg";
 const Navbar = () => {
   const [openDropDown, setopenDropDown] = useState(false);
   const [openNotifications, seOpenNotifications] = useState(false);
-  const { currentUser } = useAuth();
+  const [shakeAnimation, setShakeAnimation] = useState(false);
+  const { currentUser, socket } = useAuth();
+
+  useEffect(() => {
+    socket.on("file-download", (data) => {
+      setShakeAnimation(!shakeAnimation);
+    });
+  }, [socket]);
+
   return (
     <nav className="bg-white py-4 shadow-lg">
       <div className="flex items-center justify-between">
-        <div className="">
+        <div className="ml-4">
           <div className="hidden md:flex space-x-2 md:space-x-4 ">
             <img src={file} alt="file" className="w-6 h-6 md:w-8 md:h-8" />
             {/* <p className="text-2xl hover:text-darkGrayishBlue">File-vert</p> */}
@@ -20,7 +28,9 @@ const Navbar = () => {
         <div className="flex flex-row space-x-12">
           <div>
             <button
-              className="hidden md:inline-flex items-center text-sm font-medium text-center text-gray-500 hover:text-gray-900 focus:outline-none"
+              className={`hidden md:inline-flex items-center text-sm font-medium text-center text-gray-500 hover:text-gray-900 focus:outline-none ${
+                shakeAnimation === true ? "animate-shake" : ""
+              }`}
               type="button"
               onClick={() => {
                 if (openNotifications) {
