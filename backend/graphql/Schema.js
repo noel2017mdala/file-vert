@@ -44,6 +44,7 @@ type Query{
 
 type Mutation{
     createUser(input: UserInput): Response,
+    createPlan(input: planInput): Response,
     userLogin(email: String, password: String): LoginResponse,
     tokenRefresh(id: ID): TokenResponse
     
@@ -56,6 +57,13 @@ input UserInput{
     email: String,
     phoneNumber: String,
     password: String
+}
+
+input planInput{
+    name: String,
+    price: String,
+    features: [String],
+    numberOfConverts: String,
 }
 `);
 

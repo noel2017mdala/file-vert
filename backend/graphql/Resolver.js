@@ -6,6 +6,7 @@ const {
   getUserFormats,
   testAxios,
 } = require("../DB/Model/UserModel");
+const { createPlan } = require("../DB/Model/PlansModel");
 const { AddDays } = require("../helper/getTime");
 const data = [
   {
@@ -121,6 +122,12 @@ const rootResolver = {
 
   fetchData: async ({}) => {
     testAxios();
+  },
+
+  createPlan: async ({ input }, args, context) => {
+    if (input) {
+      return createPlan(input);
+    }
   },
 };
 

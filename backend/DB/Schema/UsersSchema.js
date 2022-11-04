@@ -35,6 +35,16 @@ const User = new Schema({
     type: Date,
     default: Date.now,
   },
+
+  numberOfConverts: {
+    type: Number,
+    required: true,
+  },
+
+  plan: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Plans",
+  },
 });
 
 User.virtual("id").get(function () {

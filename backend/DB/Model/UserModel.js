@@ -2,6 +2,7 @@ const fs = require("fs");
 const mongoose = require("mongoose");
 const UserSchema = require("../Schema/UsersSchema");
 const User = mongoose.model("User", UserSchema);
+const { createPlan, getPlan } = require("./PlansModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
@@ -32,9 +33,13 @@ const createUser = async (userData) => {
     //check if the user already exists in the database
     if (!checkIfUserExists) {
       try {
+        const getFreePlan = await getPlan("free");
+
         let createUser = new User({
           ...userData,
           password: await bcrypt.hash(password, 12),
+          plan: getFreePlan._id,
+          numberOfConverts: getFreePlan.numberOfConverts
         });
 
         //create user
