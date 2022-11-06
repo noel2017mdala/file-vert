@@ -39,7 +39,7 @@ const createUser = async (userData) => {
           ...userData,
           password: await bcrypt.hash(password, 12),
           plan: getFreePlan._id,
-          numberOfConverts: getFreePlan.numberOfConverts
+          numberOfConverts: getFreePlan.numberOfConverts,
         });
 
         //create user
@@ -384,6 +384,37 @@ const downloadFile = async (fileId, cb) => {
   });
 };
 
+const updateUserActiveState = async (userId) => {
+  if (userId) {
+    const updateUserState = await User.findByIdAndUpdate(
+      userId,
+      {
+        userActive: true,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (updateUserState) {
+      return {
+        status: true,
+        message: "user status updated successfully",
+      };
+    } else {
+      return {
+        status: false,
+        message: "Failed to update user status",
+      };
+    }
+  } else {
+    return {
+      status: false,
+      message: "Failed to update user status",
+    };
+  }
+};
+
 module.exports = {
   createUser,
   login,
@@ -394,4 +425,5 @@ module.exports = {
   uploadFileConvert,
   getFileStatus,
   downloadFile,
+  updateUserActiveState,
 };

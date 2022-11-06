@@ -8,14 +8,11 @@ import ClipLoader from "react-spinners/ClipLoader";
 import axios from "axios";
 import { css } from "@emotion/react";
 import { notify } from "../../helper/notification";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import { ToastContainer } from "react-toastify";
 const GetStarted = () => {
   const [files, setFiles] = useState();
   const [dropDown, toggleDropdown] = useState(false);
   const [convertTypes, setConvertTypes] = useState([]);
-
   const [extensionName, setExtensionName] = useState("");
   const [convertName, setConvertName] = useState("Convert to");
   const [loaderState, setLoaderState] = useState(false);
@@ -23,7 +20,6 @@ const GetStarted = () => {
   const [downloadContent, setDownloadContent] = useState();
   const { currentUser, socket } = useAuth();
 
-  const MySwal = withReactContent(Swal);
   // const [getRootProps, getInputProps] = useDropzone({
   //   accept: "image/*",
   //   onDrop: (acceptedFiles) => {
@@ -38,12 +34,6 @@ const GetStarted = () => {
   // });
 
   useEffect(() => {
-    MySwal.fire({
-      icon: "info",
-      title: `Welcome ${currentUser.user.firstName}`,
-      text: "you are currently using the free trial subscription, but you can change in the setting tab",
-      confirmButtonColor: "#F25F3A",
-    });
     socket.on("file-download", (data) => {
       setDownloadButton(true);
       setDownloadContent(data.result);

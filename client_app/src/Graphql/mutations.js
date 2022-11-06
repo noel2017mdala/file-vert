@@ -28,13 +28,22 @@ export const CREATE_ACCOUNT = gql`
 `;
 
 export const TOKEN_REFRESH = gql`
-mutation($id: ID){
-  tokenRefresh(id: $id){
-    token
-    response {
+  mutation ($id: ID) {
+    tokenRefresh(id: $id) {
+      token
+      response {
         status
         message
       }
+    }
   }
-}
+`;
+
+export const UPDATE_USER_ACTIVE = gql`
+  mutation ($id: ID) {
+    updateUserState(id: $id) {
+      status
+      message
+    }
+  }
 `;

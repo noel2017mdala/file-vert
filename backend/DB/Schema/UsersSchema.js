@@ -36,6 +36,11 @@ const User = new Schema({
     default: Date.now,
   },
 
+  userActive: {
+    type: Boolean,
+    default: false,
+  },
+
   numberOfConverts: {
     type: Number,
     required: true,

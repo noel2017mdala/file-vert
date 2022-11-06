@@ -5,6 +5,7 @@ const {
   refreshToken,
   getUserFormats,
   testAxios,
+  updateUserActiveState,
 } = require("../DB/Model/UserModel");
 const { createPlan } = require("../DB/Model/PlansModel");
 const { AddDays } = require("../helper/getTime");
@@ -74,26 +75,28 @@ const rootResolver = {
     }
   },
 
-  // getUser: async ({ id }, args, context) => {
-  //   if (id && id !== "") {
-  //     if (args.request.req["headers"].cookie) {
-  //       let tokens = args.request.req["headers"].cookie.split(";");
-  //       if (tokens.length === 2) {
-  //         let accessToken = tokens[0];
-  //         let refreshToken = tokens[1];
+  getUser: async ({ id }, args, context) => {
+    // if (id && id !== "") {
+    //   if (args.request.req["headers"].cookie) {
+    //     let tokens = args.request.req["headers"].cookie.split(";");
+    //     if (tokens.length === 2) {
+    //       let accessToken = tokens[0];
+    //       let refreshToken = tokens[1];
 
-  //         console.log(accessToken);
-  //         console.log(refreshToken);
-  //       } else {
-  //         // args.request.res.status(403);
-  //       }
-  //     } else {
-  //       console.log("not found");
-  //       // args.request.res.status(403);
-  //     }
-  //     return getUserData(id);
-  //   }
-  // },
+    //       console.log(accessToken);
+    //       console.log(refreshToken);
+    //     } else {
+    //       // args.request.res.status(403);
+    //     }
+    //   } else {
+    //     console.log("not found");
+    //     // args.request.res.status(403);
+    //   }
+
+    // }
+
+    return getUserData(id);
+  },
 
   tokenRefresh: async ({ id }, args, context) => {
     const requestRefreshToken = args.request.req["headers"].cookie;
@@ -128,6 +131,10 @@ const rootResolver = {
     if (input) {
       return createPlan(input);
     }
+  },
+
+  updateUserState: async ({ id }, args, context) => {
+    return updateUserActiveState(id);
   },
 };
 

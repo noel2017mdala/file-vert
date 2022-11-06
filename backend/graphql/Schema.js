@@ -7,7 +7,8 @@ type User{
     id: ID,
     email: String,
     phoneNumber: String,
-    password: String
+    password: String,
+    userActive: Boolean,
 }
 
 type Response{
@@ -45,6 +46,7 @@ type Query{
 type Mutation{
     createUser(input: UserInput): Response,
     createPlan(input: planInput): Response,
+    updateUserState(id: ID): Response
     userLogin(email: String, password: String): LoginResponse,
     tokenRefresh(id: ID): TokenResponse
     
