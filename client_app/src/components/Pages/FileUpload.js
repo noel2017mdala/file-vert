@@ -58,7 +58,7 @@ const GetStarted = () => {
       formData.append("file", files);
 
       axios
-        .put(` http://localhost:8000/upload`, formData)
+        .put(` http://localhost:8000/upload/${currentUser.user.id}`, formData)
         .then((res) => {
           // console.log(res.data);
           if (res.data.status) {
@@ -98,7 +98,7 @@ const GetStarted = () => {
   } = useGQLQuery(
     "fetch_data",
     FETCH_DATA,
-    { id: currentUser.user.id },
+    { id: currentUser.user.id, format: "PPT" },
     {
       enabled: false,
     }
@@ -266,6 +266,8 @@ const GetStarted = () => {
                   } else {
                     notify.fail("Please select a file to convert");
                   }
+
+                  // dataRefetch();
                 }}
               >
                 {loaderState ? (

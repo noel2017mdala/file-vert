@@ -123,8 +123,10 @@ const rootResolver = {
     }
   },
 
-  fetchData: async ({}) => {
-    testAxios();
+  fetchData: async ({ id, format }, args, context) => {
+    // console.log("hello");
+    // console.log(id, format);
+    testAxios(id, format);
   },
 
   createPlan: async ({ input }, args, context) => {

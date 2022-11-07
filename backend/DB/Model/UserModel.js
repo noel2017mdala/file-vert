@@ -162,7 +162,7 @@ const login = async (userData) => {
 
 const getUserData = async (userId) => {
   if (userId && userId !== "") {
-    let getUserData = await User.findById(userId);
+    let getUserData = await User.findById(userId).populate("plan");
     if (getUserData) {
       return getUserData;
     }
@@ -206,6 +206,15 @@ const refreshToken = async (id, refreshToken) => {
     };
   }
 };
+
+// const getUser = async ({ id }) => {
+//   if (id) {
+//     let user = await User.findOne({ _id: id });
+//     if (user) {
+//       return user;
+//     }
+//   }
+// };
 
 const getUserFormats = (id, format) => {
   if (id && format) {
@@ -269,7 +278,7 @@ const getUserFormats = (id, format) => {
   }
 };
 
-const testAxios = async () => {
+const testAxios = async (id, format) => {
   // let data = await axios.get(
   //   "https://sandbox.zamzar.com/v1/formats/gif",
   //   {},
@@ -283,7 +292,7 @@ const testAxios = async () => {
 
   // console.log(data);
 
-  let url = "https://sandbox.zamzar.com/v1/formats/mp4";
+  let url = `https://sandbox.zamzar.com/v1/formats/${format}`;
   let data = await axios({
     method: "get",
     url,
@@ -333,7 +342,21 @@ const uploadFileConvert = async (path, ext, cb) => {
 };
 
 const getFileStatus = async (jobId) => {
+  console.log("wawawwwawa");
   console.log(jobId);
+
+  if (jobId) {
+    let url = `https://sandbox.zamzar.com/v1/jobs/${jobId}`;
+    let data = await axios({
+      method: "get",
+      url,
+      auth: {
+        username: "558686f9377507c05f3d7845b80d64a364578227",
+        password: "",
+      },
+    });
+    return data.data;
+  }
   // var request = require("request"),
   //   apiKey = "558686f9377507c05f3d7845b80d64a364578227";
 
@@ -350,19 +373,7 @@ const getFileStatus = async (jobId) => {
   //   )
   //   .auth(apiKey, "", true);
 
-  let url = `https://sandbox.zamzar.com/v1/jobs/${jobId}`;
-  let data = await axios({
-    method: "get",
-    url,
-    auth: {
-      username: "558686f9377507c05f3d7845b80d64a364578227",
-      password: "",
-    },
-  });
-
   // console.log(data.data);
-
-  return data.data;
 };
 
 const downloadFile = async (fileId, cb) => {

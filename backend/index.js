@@ -12,25 +12,57 @@ const {
   uploadFileConvert,
   getFileStatus,
   downloadFile,
+  getUserData,
 } = require("./DB/Model/UserModel");
 
 const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 const port = process.env.PORT || 8000;
+const fileSize = 2000000;
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "images");
+  destination: async (req, file, cb) => {
+    let user = await getUserData(req.params.id);
+    if (user.plan.name === "free") {
+      cb(null, "images/free");
+    } else if (user.plan.name === "personal") {
+      console.log("personal");
+      cb(null, "images/personal");
+    } else if (user.plan.name === "professional") {
+      console.log("professional");
+      cb(null, "images/professional");
+    } else if (user.plan.name === "enterprise") {
+      console.log("enterprise");
+      cb(null, "images/enterprise");
+    }
   },
 
-  filename: (req, file, cb) => {
-    // console.log(file);
-    cb(null, Date.now() + path.extname(file.originalname));
+  filename: async (req, file, cb) => {
+    let user = await getUserData(req.params.id);
+    if (user.plan.name === "free") {
+      // console.log("free");
+      // return;
+      cb(null, Date.now() + path.extname(file.originalname));
+    } else if (user.plan.name === "personal") {
+      console.log("personal");
+      cb(null, Date.now() + path.extname(file.originalname));
+    } else if (user.plan.name === "professional") {
+      console.log("professional");
+      cb(null, Date.now() + path.extname(file.originalname));
+    } else if (user.plan.name === "enterprise") {
+      console.log("enterprise");
+      cb(null, Date.now() + path.extname(file.originalname));
+    }
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: fileSize,
+  },
+});
 const cors = require("cors");
 require("dotenv/config");
 
@@ -44,7 +76,7 @@ app.use(
 app.use(cookieParser());
 app.use(morgan("tiny"));
 
-app.put("/upload", upload.single("file"), async (req, res) => {
+app.put("/upload/:id", upload.single("file"), async (req, res) => {
   const obj = JSON.parse(JSON.stringify(req.body));
 
   const convertFile = await uploadFileConvert(

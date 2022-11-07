@@ -37,7 +37,7 @@ type convertFormat {
 type Query{
     getUser(id: ID): User,
     getFormats(id: ID, format: String): convertFormat
-    fetchData: String
+    fetchData(id: ID, format: String): convertFormat
    # getUsers: [User],
 }
 

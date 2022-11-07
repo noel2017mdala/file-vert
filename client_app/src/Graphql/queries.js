@@ -12,7 +12,7 @@ export const GET_USERS = gql`
 export const GET_USER = gql`
   query ($id: ID) {
     getUser(id: $id) {
-      firstName,
+      firstName
       userActive
     }
   }
@@ -30,7 +30,12 @@ export const GET_FORMATS = gql`
 `;
 
 export const FETCH_DATA = gql`
-  query {
-    fetchData
+  query ($id: ID, $format: String) {
+    fetchData(id: $id, format: $format) {
+      format
+      response {
+        status
+      }
+    }
   }
 `;
