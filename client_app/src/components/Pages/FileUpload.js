@@ -114,12 +114,17 @@ const GetStarted = () => {
       setExtensionName(fileFormat);
       setTimeout(async () => {
         let fileExt = await refetch();
-        if (fileExt.data.getFormats.response.status) {
-          setConvertTypes(fileExt.data.getFormats.format);
-          setFiles(acceptedFiles);
+        if (fileExt.data.getFormats) {
+          if (fileExt.data.getFormats.response.status) {
+            setConvertTypes(fileExt.data.getFormats.format);
+            setFiles(acceptedFiles);
+          } else {
+            setFiles(undefined);
+          }
         } else {
           setFiles(undefined);
         }
+
         setLoaderState(false);
       }, 1000);
     } else {

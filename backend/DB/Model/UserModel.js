@@ -13,6 +13,7 @@ const {
   validateRefreshToken,
 } = require("../../helper/generateAccessToken");
 const { getTime } = require("../../helper/getTime");
+const getFileSizeInBytes = require("../../helper/getFileSize");
 
 const createUser = async (userData) => {
   //destracture the userData input
@@ -216,8 +217,141 @@ const refreshToken = async (id, refreshToken) => {
 //   }
 // };
 
-const getUserFormats = (id, format) => {
+const getUserFormats = async (id, format) => {
   if (id && format) {
+    let getUser = await getUserData(id);
+    // console.log(getUser);
+    //professional and enterprise
+    // let userFormats = await testAxios("", format);
+    // let convertFormat = [];
+    // userFormats.targets.map((data) => {
+    //   convertFormat.push(data.name);
+    // });
+
+    // console.log(convertFormat);
+    // return;
+
+    if (getUser) {
+      if (getUser.plan.name === "free") {
+        if (format === "pdf") {
+          return {
+            format: ["doc", "png", "jpg"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "jpg") {
+          return {
+            format: ["pdf"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "png") {
+          return {
+            format: ["pdf"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "jpeg") {
+          return {
+            format: ["pdf"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else {
+          return {
+            response: {
+              status: false,
+              message: "failed to get file extensions",
+            },
+            format: null,
+          };
+        }
+      } else if (getUser.plan.name === "personal") {
+        if (format === "pdf") {
+          return {
+            format: ["doc", "png", "jpg", "ppt", "csv"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "csv") {
+          return {
+            format: ["doc"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "doc") {
+          return {
+            format: ["pdf", "jpg"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "jpg") {
+          return {
+            format: ["png", "gif"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "gif") {
+          return {
+            format: ["png", "jpg"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "svg") {
+          return {
+            format: ["png", "jpg"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "ppt") {
+          return {
+            format: ["png", "jpg"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        } else if (format === "epub") {
+          return {
+            format: ["pdf"],
+            response: {
+              status: true,
+              message: "file extension",
+            },
+          };
+        }
+      }
+    } else {
+      return {
+        response: {
+          status: false,
+          message: "failed to get file extensions",
+        },
+        format: null,
+      };
+    }
+
+    return;
     if (format === "pdf") {
       return {
         format: ["doc", "ppt", "csv", "png", "jpg"],
@@ -302,14 +436,125 @@ const testAxios = async (id, format) => {
     },
   });
 
-  console.log(data.data);
+  // console.log(data);
+
+  return data.data;
 };
 
-const uploadFileConvert = async (path, ext, cb) => {
-  let formData = {
-    target_format: ext,
-    source_file: fs.createReadStream(path),
-  };
+const uploadFileConvert = async (path, ext, user, cb) => {
+  const getFieSize = await getFileSizeInBytes(path);
+  // console.log(getFieSize);
+  if (user) {
+    if (user.plan.name === "free") {
+      //1 MB
+      if (getFieSize <= 1000000) {
+        let formData = {
+          target_format: ext,
+          source_file: fs.createReadStream(path),
+        };
+
+        request
+          .post(
+            { url: "https://sandbox.zamzar.com/v1/jobs/", formData: formData },
+            function (err, response, body) {
+              if (err) {
+                cb({ response: err, status: false });
+              } else {
+                let response = JSON.parse(body);
+                cb({ response, status: true });
+              }
+            }
+          )
+          .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
+      } else {
+        fs.unlinkSync(path);
+        cb({ response: "err", status: false });
+      }
+    } else if (user.plan.name === "personal") {
+      //100 MB
+      if (getFieSize <= 104857600) {
+        let formData = {
+          target_format: ext,
+          source_file: fs.createReadStream(path),
+        };
+
+        request
+          .post(
+            { url: "https://sandbox.zamzar.com/v1/jobs/", formData: formData },
+            function (err, response, body) {
+              if (err) {
+                cb({ response: err, status: false });
+              } else {
+                let response = JSON.parse(body);
+                cb({ response, status: true });
+              }
+            }
+          )
+          .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
+      } else {
+        fs.unlinkSync(path);
+        cb({ response: "err", status: false });
+      }
+    } else if (user.plan.name === "professional") {
+      //1 GB
+      if (getFieSize <= 1073741824) {
+        let formData = {
+          target_format: ext,
+          source_file: fs.createReadStream(path),
+        };
+
+        request
+          .post(
+            { url: "https://sandbox.zamzar.com/v1/jobs/", formData: formData },
+            function (err, response, body) {
+              if (err) {
+                cb({ response: err, status: false });
+              } else {
+                let response = JSON.parse(body);
+                cb({ response, status: true });
+              }
+            }
+          )
+          .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
+      } else {
+        fs.unlinkSync(path);
+        cb({ response: "err", status: false });
+      }
+    } else if (user.plan.name === "enterprise") {
+      //5 GB
+      if (getFieSize <= 5368709120) {
+        let formData = {
+          target_format: ext,
+          source_file: fs.createReadStream(path),
+        };
+
+        request
+          .post(
+            { url: "https://sandbox.zamzar.com/v1/jobs/", formData: formData },
+            function (err, response, body) {
+              if (err) {
+                cb({ response: err, status: false });
+              } else {
+                let response = JSON.parse(body);
+                cb({ response, status: true });
+              }
+            }
+          )
+          .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
+      } else {
+        fs.unlinkSync(path);
+        cb({ response: "err", status: false });
+      }
+    }
+  } else {
+    cb({ response: "err", status: false });
+  }
+
+  // return;
+  // let formData = {
+  //   target_format: ext,
+  //   source_file: fs.createReadStream(path),
+  // };
 
   // let url = "https://sandbox.zamzar.com/v1/jobs/";
   // let data = await axios({
@@ -325,25 +570,11 @@ const uploadFileConvert = async (path, ext, cb) => {
   // });
 
   // console.log(data);
-
-  request
-    .post(
-      { url: "https://sandbox.zamzar.com/v1/jobs/", formData: formData },
-      function (err, response, body) {
-        if (err) {
-          cb({ response: err, status: false });
-        } else {
-          let response = JSON.parse(body);
-          cb({ response, status: true });
-        }
-      }
-    )
-    .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
 };
 
 const getFileStatus = async (jobId) => {
-  console.log("wawawwwawa");
-  console.log(jobId);
+  // console.log("wawawwwawa");
+  // console.log(jobId);
 
   if (jobId) {
     let url = `https://sandbox.zamzar.com/v1/jobs/${jobId}`;
