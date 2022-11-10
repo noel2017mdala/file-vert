@@ -24,6 +24,7 @@ export const GET_FORMATS = gql`
       format
       response {
         status
+        message
       }
     }
   }

@@ -13,6 +13,7 @@ const {
   getFileStatus,
   downloadFile,
   getUserData,
+  updateConverts,
 } = require("./DB/Model/UserModel");
 
 const app = express();
@@ -112,16 +113,25 @@ app.put("/upload/:id", upload.single("file"), async (req, res) => {
 
           if (getUploadStatus && getUploadStatus.status) {
             if (getUploadStatus.status === "successful") {
-              const downloadedFile = await downloadFile(
-                getUploadStatus.target_files[0].id,
-                (result) => {
-                  io.sockets.emit("file-download", {
-                    message: "file ready for download",
-                    result,
-                  });
-                  clearInterval(getConvertStatus);
-                }
+              // console.log(user);
+              const updateConvertStatus = await updateConverts(
+                user._id,
+                user.numberOfConverts
               );
+
+              // console.log(getConvertStatus);
+              if (updateConvertStatus.status) {
+                await downloadFile(
+                  getUploadStatus.target_files[0].id,
+                  (result) => {
+                    io.sockets.emit("file-download", {
+                      message: "file ready for download",
+                      result,
+                    });
+                    clearInterval(getConvertStatus);
+                  }
+                );
+              }
             }
           } else {
             console.log("failed");

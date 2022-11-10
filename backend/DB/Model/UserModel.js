@@ -221,6 +221,8 @@ const getUserFormats = async (id, format) => {
   if (id && format) {
     let getUser = await getUserData(id);
     // console.log(getUser);
+    // return;
+    // console.log(getUser);
     //professional and enterprise
     // let userFormats = await testAxios("", format);
     // let convertFormat = [];
@@ -232,120 +234,164 @@ const getUserFormats = async (id, format) => {
     // return;
 
     if (getUser) {
-      if (getUser.plan.name === "free") {
-        if (format === "pdf") {
-          return {
-            format: ["doc", "png", "jpg"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "jpg") {
-          return {
-            format: ["pdf"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "png") {
-          return {
-            format: ["pdf"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "jpeg") {
-          return {
-            format: ["pdf"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else {
-          return {
-            response: {
-              status: false,
-              message: "failed to get file extensions",
-            },
-            format: null,
-          };
+      if (getUser.numberOfConverts >= 1) {
+        if (getUser.plan.name === "free") {
+          if (format === "pdf") {
+            return {
+              format: ["doc", "png", "jpg"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "jpg") {
+            return {
+              format: ["pdf"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "png") {
+            return {
+              format: ["pdf"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "jpeg") {
+            return {
+              format: ["pdf"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else {
+            return {
+              response: {
+                status: false,
+                message:
+                  "your plan does not support this file format please try upgrading to a different plan or try again",
+              },
+              format: null,
+            };
+          }
+        } else if (getUser.plan.name === "personal") {
+          if (format === "pdf") {
+            return {
+              format: ["doc", "png", "jpg", "ppt", "csv"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "csv") {
+            return {
+              format: ["doc"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "doc") {
+            return {
+              format: ["pdf", "jpg"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "jpg") {
+            return {
+              format: ["png", "gif"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "gif") {
+            return {
+              format: ["png", "jpg"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "svg") {
+            return {
+              format: ["png", "jpg"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "ppt") {
+            return {
+              format: ["png", "jpg"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else if (format === "epub") {
+            return {
+              format: ["pdf"],
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else {
+            return {
+              response: {
+                status: false,
+                message:
+                  "your plan does not support this file format please try upgrading to a different plan or try again",
+              },
+              format: null,
+            };
+          }
+        } else if (getUser.plan.name === "professional" || getUser.plan.name === "enterprise") {
+          //professional and enterprise
+          let userFormats = await testAxios("", format);
+          let convertFormat = [];
+          userFormats.targets.map((data) => {
+            convertFormat.push(data.name);
+          });
+          if (convertFormat.length > 0) {
+            return {
+              format: convertFormat,
+              response: {
+                status: true,
+                message: "file extension",
+              },
+            };
+          } else {
+            return {
+              response: {
+                status: false,
+                message: "failed to get file extensions please try again later",
+              },
+              format: null,
+            };
+          }
         }
-      } else if (getUser.plan.name === "personal") {
-        if (format === "pdf") {
-          return {
-            format: ["doc", "png", "jpg", "ppt", "csv"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "csv") {
-          return {
-            format: ["doc"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "doc") {
-          return {
-            format: ["pdf", "jpg"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "jpg") {
-          return {
-            format: ["png", "gif"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "gif") {
-          return {
-            format: ["png", "jpg"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "svg") {
-          return {
-            format: ["png", "jpg"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "ppt") {
-          return {
-            format: ["png", "jpg"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        } else if (format === "epub") {
-          return {
-            format: ["pdf"],
-            response: {
-              status: true,
-              message: "file extension",
-            },
-          };
-        }
+      } else {
+        return {
+          response: {
+            status: false,
+            message: "you do not have any converts left",
+          },
+          format: null,
+        };
       }
     } else {
       return {
         response: {
           status: false,
-          message: "failed to get file extensions",
+          message: "failed to get file extensions please try again later",
         },
         format: null,
       };
@@ -458,7 +504,13 @@ const uploadFileConvert = async (path, ext, user, cb) => {
             { url: "https://sandbox.zamzar.com/v1/jobs/", formData: formData },
             function (err, response, body) {
               if (err) {
-                cb({ response: err, status: false });
+                cb({
+                  response: {
+                    message:
+                      "failed to convert your file please try again later",
+                  },
+                  status: false,
+                });
               } else {
                 let response = JSON.parse(body);
                 cb({ response, status: true });
@@ -468,7 +520,12 @@ const uploadFileConvert = async (path, ext, user, cb) => {
           .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
       } else {
         fs.unlinkSync(path);
-        cb({ response: "err", status: false });
+        cb({
+          response: {
+            message: "you can not upload files more than 1 MB",
+          },
+          status: false,
+        });
       }
     } else if (user.plan.name === "personal") {
       //100 MB
@@ -493,7 +550,12 @@ const uploadFileConvert = async (path, ext, user, cb) => {
           .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
       } else {
         fs.unlinkSync(path);
-        cb({ response: "err", status: false });
+        cb({
+          response: {
+            message: "you can not upload files more than 100 MB",
+          },
+          status: false,
+        });
       }
     } else if (user.plan.name === "professional") {
       //1 GB
@@ -518,7 +580,12 @@ const uploadFileConvert = async (path, ext, user, cb) => {
           .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
       } else {
         fs.unlinkSync(path);
-        cb({ response: "err", status: false });
+        cb({
+          response: {
+            message: "you can not upload files more than 1 GB",
+          },
+          status: false,
+        });
       }
     } else if (user.plan.name === "enterprise") {
       //5 GB
@@ -543,7 +610,12 @@ const uploadFileConvert = async (path, ext, user, cb) => {
           .auth("558686f9377507c05f3d7845b80d64a364578227", "", true);
       } else {
         fs.unlinkSync(path);
-        cb({ response: "err", status: false });
+        cb({
+          response: {
+            message: "you can not upload files more than 5 GB",
+          },
+          status: false,
+        });
       }
     }
   } else {
@@ -657,6 +729,39 @@ const updateUserActiveState = async (userId) => {
   }
 };
 
+const updateConverts = async (id, convertNumber) => {
+  if (id && convertNumber) {
+    let userConvertNumber = convertNumber - 1;
+
+    const updateUserState = await User.findByIdAndUpdate(
+      id,
+      {
+        numberOfConverts: userConvertNumber,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (updateUserState) {
+      return {
+        status: true,
+        message: "user converts updated successfully",
+      };
+    } else {
+      return {
+        status: false,
+        message: "Failed to update user converts",
+      };
+    }
+  } else {
+    return {
+      status: false,
+      message: "Failed to update user converts",
+    };
+  }
+};
+
 module.exports = {
   createUser,
   login,
@@ -668,4 +773,5 @@ module.exports = {
   getFileStatus,
   downloadFile,
   updateUserActiveState,
+  updateConverts,
 };

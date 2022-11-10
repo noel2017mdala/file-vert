@@ -63,12 +63,12 @@ const GetStarted = () => {
           // console.log(res.data);
           if (res.data.status) {
             notify.successBottom(
-              "you file is being converted you will be notified once done "
+              "Your file is being converted you will be notified once done "
             );
             setLoaderState(false);
             setFiles(undefined);
           } else {
-            notify.fail("failed to convert your file please try again later");
+            notify.fail(res.data.response.message);
             setLoaderState(false);
             setFiles(undefined);
           }
@@ -114,11 +114,13 @@ const GetStarted = () => {
       setExtensionName(fileFormat);
       setTimeout(async () => {
         let fileExt = await refetch();
+
         if (fileExt.data.getFormats) {
           if (fileExt.data.getFormats.response.status) {
             setConvertTypes(fileExt.data.getFormats.format);
             setFiles(acceptedFiles);
           } else {
+            notify.fail(fileExt.data.getFormats.response.message);
             setFiles(undefined);
           }
         } else {
