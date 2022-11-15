@@ -23,6 +23,8 @@
   margin: 0px; */
   /* transform: translate(0px, 470px); */
 }
+
+
 @media (max-width: 576px) {
   .main {
     background-position: 50px -50px;

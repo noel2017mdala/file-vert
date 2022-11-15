@@ -7,17 +7,8 @@ const {
   testAxios,
   updateUserActiveState,
 } = require("../DB/Model/UserModel");
-const { createPlan } = require("../DB/Model/PlansModel");
+const { createPlan, getAllPlans } = require("../DB/Model/PlansModel");
 const { AddDays } = require("../helper/getTime");
-const data = [
-  {
-    firstName: "Abel",
-    lastName: "Mdala",
-    uid: 1,
-    email: "noelmdala1017@gmail.com",
-    contact: "997216715",
-  },
-];
 
 const rootResolver = {
   createUser: ({ input }) => {
@@ -137,6 +128,10 @@ const rootResolver = {
 
   updateUserState: async ({ id }, args, context) => {
     return updateUserActiveState(id);
+  },
+
+  getAllPlans: async () => {
+    return await getAllPlans();
   },
 };
 

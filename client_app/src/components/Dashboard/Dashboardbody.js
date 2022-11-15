@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useGQLMutation } from "../../hooks/useGqlMutations";
 import { UPDATE_USER_ACTIVE } from "../../Graphql/mutations";
+import Settings from "../Pages/Settings";
 
 const DashboardBody = ({ state, changeState }) => {
   const { currentUser, socket } = useAuth();
@@ -70,6 +71,8 @@ const DashboardBody = ({ state, changeState }) => {
           <Notification />
         ) : state.files ? (
           <Files />
+        ) : state.settings ? (
+          <Settings />
         ) : (
           "Nothing to display"
         )}

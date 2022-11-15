@@ -40,3 +40,14 @@ export const FETCH_DATA = gql`
     }
   }
 `;
+
+export const GET_USER_PLANS = gql`
+  query {
+    getAllPlans {
+      name
+      features
+      price
+      id
+    }
+  }
+`;

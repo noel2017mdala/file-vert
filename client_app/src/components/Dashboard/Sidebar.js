@@ -222,7 +222,7 @@ const Sidebar = ({ state, changeState }) => {
               </p>
             </li>
 
-            <li
+            {/* <li
               onClick={() => {
                 changeState({
                   dashboard: false,
@@ -264,7 +264,7 @@ const Sidebar = ({ state, changeState }) => {
                   Profile
                 </span>
               </p>
-            </li>
+            </li> */}
 
             <li
               onClick={() => {

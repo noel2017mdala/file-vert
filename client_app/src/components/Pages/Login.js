@@ -223,8 +223,8 @@ const UserLogin = () => {
               type="reset"
               className="w-max p-3 -mr-3"
               onClick={async () => {
-                let userData = await refetch();
-                console.log(userData.data.getUser);
+                // let userData = await refetch();
+                // console.log(userData.data.getUser);
               }}
             >
               <span className="text-sm tracking-wide text-blue-600">

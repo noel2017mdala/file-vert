@@ -54,7 +54,13 @@ const getPlan = async (planName) => {
   }
 };
 
+const getAllPlans = async () => {
+  let getAllPlans = await Plans.find().sort("price");
+  return getAllPlans;
+};
+
 module.exports = {
   createPlan,
   getPlan,
+  getAllPlans,
 };

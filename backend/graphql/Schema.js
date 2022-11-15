@@ -34,11 +34,20 @@ type convertFormat {
     response: Response
 }
 
+type Plans {
+    name: String,
+    price: String,
+    id: ID,
+    numberOfConverts: String,
+    features: [String]
+}
+
 type Query{
     getUser(id: ID): User,
     getFormats(id: ID, format: String): convertFormat
     fetchData(id: ID, format: String): convertFormat
    # getUsers: [User],
+    getAllPlans: [Plans]
 }
 
 
