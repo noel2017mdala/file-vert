@@ -13,7 +13,12 @@ export const GET_USER = gql`
   query ($id: ID) {
     getUser(id: $id) {
       firstName
+      lastName
+      email
       userActive
+      plan {
+        name
+      }
     }
   }
 `;

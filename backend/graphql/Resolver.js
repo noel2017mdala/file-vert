@@ -85,8 +85,7 @@ const rootResolver = {
     //   }
 
     // }
-
-    return getUserData(id);
+    return await getUserData(id);
   },
 
   tokenRefresh: async ({ id }, args, context) => {
@@ -94,7 +93,6 @@ const rootResolver = {
 
     if (id && requestRefreshToken) {
       let rToken = requestRefreshToken.split("=");
-      // console.log(requestRefreshToken);
       return refreshToken(id, rToken[1]);
     } else {
       return {
@@ -115,8 +113,6 @@ const rootResolver = {
   },
 
   fetchData: async ({ id, format }, args, context) => {
-    // console.log("hello");
-    // console.log(id, format);
     testAxios(id, format);
   },
 

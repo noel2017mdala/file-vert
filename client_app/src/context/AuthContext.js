@@ -1,9 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { Link, useNavigate } from "react-router-dom";
-// import { useGQLQuery } from "../hooks/useGqlQueries";
+import { useGQLQuery } from "../hooks/useGqlQueries";
 import { useGQLMutation } from "../hooks/useGqlMutations";
 import { LOGIN, TOKEN_REFRESH } from "../Graphql/mutations";
+import { GET_USER } from "../Graphql/queries";
 
 const AuthContext = React.createContext();
 
@@ -29,6 +30,17 @@ export const AuthProvider = ({ children }) => {
   });
 
   const navigate = useNavigate();
+
+  const { data, isLoading, error, refetch } = useGQLQuery(
+    "get_current_user",
+    GET_USER,
+    {
+      id: userId,
+    },
+    {
+      enabled: false,
+    }
+  );
 
   useEffect(() => {
     const userAuth = window.localStorage.getItem("user_items");

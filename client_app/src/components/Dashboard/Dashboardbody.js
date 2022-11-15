@@ -60,19 +60,19 @@ const DashboardBody = ({ state, changeState }) => {
 
   return (
     <div className="min-h-screen bg-white w-screen">
-      <Navbar />
+      <Navbar userData={data} />
 
       <div>
         {state.dashboard ? (
           <GetStarted />
         ) : state.messages ? (
-          <Messages />
+          <Messages userData={data} />
         ) : state.notifications ? (
-          <Notification />
+          <Notification userData={data} />
         ) : state.files ? (
-          <Files />
+          <Files userData={data} />
         ) : state.settings ? (
-          <Settings />
+          <Settings userData={data} />
         ) : (
           "Nothing to display"
         )}

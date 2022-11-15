@@ -9,6 +9,7 @@ type User{
     phoneNumber: String,
     password: String,
     userActive: Boolean,
+    plan: Plans,
 }
 
 type Response{

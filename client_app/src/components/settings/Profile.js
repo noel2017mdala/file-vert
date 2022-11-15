@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PhoneInput from "react-phone-number-input";
-const Profile = () => {
+const Profile = ({ userData }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+
+  useEffect(() => {
+    if (userData && userData.getUser) {
+      setFirstName(userData.getUser.firstName);
+      setLastName(userData.getUser.lastName);
+      setEmail(userData.getUser.email);
+    }
+  }, [userData]);
   return (
     <div className="mx-2">
       <div>
@@ -54,7 +62,7 @@ const Profile = () => {
                   autoComplete="off"
                   required
                   onChange={(text) => {
-                    console.log(text);
+                    setFirstName(text.target.value);
                   }}
                 />
               </div>
@@ -82,7 +90,7 @@ const Profile = () => {
                   required
                   autoComplete="off"
                   onChange={(text) => {
-                    console.log(text);
+                    setLastName(text.target.value);
                   }}
                 />
               </div>
@@ -113,7 +121,7 @@ const Profile = () => {
                   required
                   autoComplete="off"
                   onChange={(text) => {
-                    console.log(text);
+                    setEmail(text.target.value);
                   }}
                 />
               </div>

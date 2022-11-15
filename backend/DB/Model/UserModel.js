@@ -353,7 +353,10 @@ const getUserFormats = async (id, format) => {
               format: null,
             };
           }
-        } else if (getUser.plan.name === "professional" || getUser.plan.name === "enterprise") {
+        } else if (
+          getUser.plan.name === "professional" ||
+          getUser.plan.name === "enterprise"
+        ) {
           //professional and enterprise
           let userFormats = await testAxios("", format);
           let convertFormat = [];

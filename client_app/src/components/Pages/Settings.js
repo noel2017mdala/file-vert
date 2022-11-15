@@ -4,7 +4,7 @@ import Billing from "../settings/Billing";
 import Notifications from "../settings/Notifications";
 import Password from "../settings/Password";
 import Profile from "../settings/Profile";
-const Settings = () => {
+const Settings = ({ userData }) => {
   const [uiState, setUiState] = useState({
     profileState: true,
     passwordState: false,
@@ -90,11 +90,11 @@ const Settings = () => {
         </div>
         <div className="mt-4 ">
           {uiState.profileState ? (
-            <Profile />
+            <Profile userData={userData} />
           ) : uiState.passwordState ? (
             <Password />
           ) : uiState.billingState ? (
-            <Billing />
+            <Billing userData={userData}/>
           ) : uiState.notificationState ? (
             <Notifications />
           ) : null}
