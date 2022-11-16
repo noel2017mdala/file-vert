@@ -765,6 +765,97 @@ const updateConverts = async (id, convertNumber) => {
   }
 };
 
+const updateProfile = async ({ id, firstName, lastName, email }) => {
+  if (id !== "" && firstName !== "" && lastName !== "" && email !== "") {
+    const updateUserProfile = await User.findByIdAndUpdate(
+      id,
+      {
+        firstName,
+        lastName,
+        email,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (updateUserProfile) {
+      return {
+        status: true,
+        message: "user profile updated successfully",
+      };
+    } else {
+      return {
+        status: false,
+        message: "failed to update user profile",
+      };
+    }
+  } else {
+    return {
+      status: false,
+      message: "failed to update user profile",
+    };
+  }
+};
+
+const updatePassword = async ({
+  id,
+  oldPassword,
+  password,
+  confirmPassword,
+}) => {
+  if (
+    id !== "" &&
+    oldPassword !== "" &&
+    password !== "" &&
+    confirmPassword !== ""
+  ) {
+    try {
+      let getUser = await User.findOne({ _id: id });
+
+      if (
+        getUser &&
+        (await bcrypt.compare(oldPassword, getUser.password)) &&
+        password === confirmPassword
+      ) {
+        console.log(getUser);
+
+        const updateUserPassword = await User.findByIdAndUpdate(
+          id,
+          {
+            password: await bcrypt.hash(password, 12),
+          },
+          {
+            new: true,
+          }
+        );
+
+        if (updateUserPassword) {
+          return {
+            status: true,
+            message: "Password updated successfully",
+          };
+        } else {
+          return {
+            status: false,
+            message: "Failed to update user password",
+          };
+        }
+      } else {
+        return {
+          status: false,
+          message: "Failed to update user password",
+        };
+      }
+    } catch (error) {
+      return {
+        status: false,
+        message: "Failed to update user password",
+      };
+    }
+  }
+};
+
 module.exports = {
   createUser,
   login,
@@ -777,4 +868,6 @@ module.exports = {
   downloadFile,
   updateUserActiveState,
   updateConverts,
+  updateProfile,
+  updatePassword,
 };

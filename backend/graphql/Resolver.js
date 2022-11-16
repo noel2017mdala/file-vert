@@ -6,6 +6,8 @@ const {
   getUserFormats,
   testAxios,
   updateUserActiveState,
+  updateProfile,
+  updatePassword,
 } = require("../DB/Model/UserModel");
 const { createPlan, getAllPlans } = require("../DB/Model/PlansModel");
 const { AddDays } = require("../helper/getTime");
@@ -128,6 +130,22 @@ const rootResolver = {
 
   getAllPlans: async () => {
     return await getAllPlans();
+  },
+
+  updateUserProfile: async (
+    { id, firstName, lastName, email },
+    args,
+    context
+  ) => {
+    return updateProfile({ id, firstName, lastName, email });
+  },
+
+  updateUserPassword: async (
+    { id, oldPassword, password, confirmPassword },
+    args,
+    context
+  ) => {
+    return await updatePassword({ id, oldPassword, password, confirmPassword });
   },
 };
 

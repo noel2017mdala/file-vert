@@ -14,7 +14,8 @@ export const GET_USER = gql`
     getUser(id: $id) {
       firstName
       lastName
-      email
+      email,
+      phoneNumber,
       userActive
       plan {
         name

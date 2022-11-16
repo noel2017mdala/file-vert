@@ -58,7 +58,9 @@ type Mutation{
     createPlan(input: planInput): Response,
     updateUserState(id: ID): Response
     userLogin(email: String, password: String): LoginResponse,
-    tokenRefresh(id: ID): TokenResponse
+    tokenRefresh(id: ID): TokenResponse,
+    updateUserProfile(id: ID, firstName: String, lastName: String, email: String): Response,
+    updateUserPassword(id: ID, oldPassword: String, password: String, confirmPassword: String): Response
     
 }
 
