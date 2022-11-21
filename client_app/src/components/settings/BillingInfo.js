@@ -2,7 +2,11 @@ import { useState } from "react";
 import card from "../../images/7341114_e-commerce_online_shopping_ui_credit card_icon.svg";
 import payPal from "../../images/4375034_logo_paypal_icon.svg";
 import { notify } from "../../helper/notification";
+import { useGQLMutation } from "../../hooks/useGqlMutations";
+import { USER_PAYMENT } from "../../Graphql/mutations";
 import { ToastContainer } from "react-toastify";
+import StripeCheckout from "react-stripe-checkout";
+import { useAuth } from "../../context/AuthContext";
 const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
   const [billingTabState, setBillingSTate] = useState({
     creditCard: false,
@@ -21,6 +25,26 @@ const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
     cvcErr: false,
   });
 
+  const { currentUser, socket } = useAuth();
+
+  const priceForStripe = billingData.price * 100;
+
+  const { mutateAsync: proceedPayment } = useGQLMutation(USER_PAYMENT, {
+    onSuccess: () => {
+      // console.log("user is ready to be logged in");
+    },
+  });
+
+  const payNow = async (token) => {
+    const userPayment = await proceedPayment({
+      id: currentUser.user.id,
+      amount: billingData.price,
+      productID: billingData.id,
+      token: token.id,
+    });
+
+    console.log(userPayment);
+  };
   return (
     <div className="mx-2">
       <div>
@@ -101,7 +125,7 @@ const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
           </div>
         </div>
 
-        <div>
+        {/* <div>
           <div className="md:w-2/5 mx-auto mt-8">
             <h2 className="capitalize text-lg py-4">Payment information</h2>
 
@@ -328,6 +352,83 @@ const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
                   </div>
                 </form>
               </div>
+            </div>
+          </div>
+        </div> */}
+
+        <div className="mt-14 md:24">
+          <div className="py-4">
+            {/* <button
+              className="block w-full max-w-xs mx-auto bg-brightRed hover:bg-brightRedLight text-white rounded-lg px-3 py-3 font-semibold"
+              onClick={(e) => {
+                e.preventDefault();
+                if (!billingTabState.creditCard && !billingTabState.payPal) {
+                  notify.fail("please choose a payment method");
+                } else if (
+                  billingTabState.creditCard ||
+                  billingTabState.payPal
+                ) {
+                  if (
+                    nameOnCard === "" &&
+                    cardNumber === "" &&
+                    expDate === "" &&
+                    cvc === ""
+                  ) {
+                    setErrorState({
+                      nameOnCardError: true,
+                      cardNumberErr: true,
+                      expDateErr: true,
+                      cvcErr: true,
+                    });
+                  } else if (nameOnCard === "") {
+                    setErrorState({
+                      nameOnCardError: true,
+                      cardNumberErr: false,
+                      expDateErr: false,
+                      cvcErr: false,
+                    });
+                  } else if (cardNumber === "") {
+                    setErrorState({
+                      nameOnCardError: false,
+                      cardNumberErr: true,
+                      expDateErr: false,
+                      cvcErr: false,
+                    });
+                  } else if (expDate === "") {
+                    setErrorState({
+                      nameOnCardError: false,
+                      cardNumberErr: false,
+                      expDateErr: true,
+                      cvcErr: false,
+                    });
+                  } else if (cvc === "") {
+                    setErrorState({
+                      nameOnCardError: false,
+                      cardNumberErr: false,
+                      expDateErr: false,
+                      cvcErr: true,
+                    });
+                  } else {
+                    console.log("about to pay");
+                  }
+                }
+              }}
+            >
+              <i className="mdi mdi-lock-outline mr-1"></i> PAY NOW
+            </button> */}
+
+            <div className="flex items-center justify-center">
+              <StripeCheckout
+                className="block w-full max-w-xs mx-auto bg-brightRed hover:bg-brightRedLight text-white rounded-lg px-3 py-3 font-semibold"
+                stripeKey={process.env.REACT_APP_PUBLISHABLE_KEY}
+                label="Pay Now"
+                name="Pay Now"
+                // billingAddress
+                // shippingAddress
+                amount={priceForStripe}
+                description={`Your total is $${billingData.price}`}
+                token={payNow}
+              />
             </div>
           </div>
         </div>

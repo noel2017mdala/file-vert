@@ -1,13 +1,17 @@
 const fs = require("fs");
 const mongoose = require("mongoose");
+require("dotenv").config();
 const UserSchema = require("../Schema/UsersSchema");
+const PlansSchema = require("../Schema/Plans");
 const User = mongoose.model("User", UserSchema);
+const Plans = mongoose.model("Plans", PlansSchema);
 const { createPlan, getPlan } = require("./PlansModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const request = require("request");
 const sendMail = require("../../helper/emailSender");
+const Stripe = require("stripe")(process.env.Stripe_API_KEY);
 const {
   generateRefreshToken,
   validateRefreshToken,
@@ -856,6 +860,39 @@ const updatePassword = async ({
   }
 };
 
+const processUserPayment = async ({ id, productID, amount, token }) => {
+  if (id !== "" && productID !== "" && amount !== "") {
+    const getUserPlan = await Plans.findOne({ _id: productID });
+    const getUser = await getUserData(id);
+
+    try {
+      let makePayment = await Stripe.charges.create({
+        source: token,
+        amount: amount * 100,
+        currency: "usd",
+      });
+
+      console.log(makePayment);
+      if (makePayment.id) {
+        return {
+          status: true,
+          message: "Payment made successfully",
+        };
+      } else {
+        return {
+          status: false,
+          message: "Payment failed please try again later",
+        };
+      }
+    } catch (error) {
+      return {
+        status: false,
+        message: "Payment failed please try again later",
+      };
+    }
+  }
+};
+
 module.exports = {
   createUser,
   login,
@@ -870,4 +907,5 @@ module.exports = {
   updateConverts,
   updateProfile,
   updatePassword,
+  processUserPayment,
 };

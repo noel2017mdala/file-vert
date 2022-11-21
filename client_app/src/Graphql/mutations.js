@@ -80,3 +80,12 @@ export const UPDATE_USER_PASSWORD = gql`
     }
   }
 `;
+
+export const USER_PAYMENT = gql`
+  mutation ($id: ID, $amount: String, $productID: ID, $token: String) {
+    processPayment(id: $id, amount: $amount, productID: $productID, token: $token) {
+      status
+      message
+    }
+  }
+`;

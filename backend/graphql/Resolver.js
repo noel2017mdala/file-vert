@@ -8,6 +8,7 @@ const {
   updateUserActiveState,
   updateProfile,
   updatePassword,
+  processUserPayment,
 } = require("../DB/Model/UserModel");
 const { createPlan, getAllPlans } = require("../DB/Model/PlansModel");
 const { AddDays } = require("../helper/getTime");
@@ -146,6 +147,10 @@ const rootResolver = {
     context
   ) => {
     return await updatePassword({ id, oldPassword, password, confirmPassword });
+  },
+
+  processPayment: async ({ id, amount, productID, token }, args, context) => {
+    return processUserPayment({ id, amount, productID, token });
   },
 };
 
