@@ -49,6 +49,7 @@ type Query{
     fetchData(id: ID, format: String): convertFormat
    # getUsers: [User],
     getAllPlans: [Plans]
+    getUserPlan(id: ID): Plans
 }
 
 
@@ -61,7 +62,8 @@ type Mutation{
     tokenRefresh(id: ID): TokenResponse,
     updateUserProfile(id: ID, firstName: String, lastName: String, email: String): Response,
     updateUserPassword(id: ID, oldPassword: String, password: String, confirmPassword: String): Response,
-    processPayment(id: ID, amount: String, productID: ID, token: String): Response    
+    processPayment(id: ID, amount: String, productID: ID, token: String): Response
+    paypalPayment(userId: ID, planId: ID):  Response
 }
 
 

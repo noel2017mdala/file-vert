@@ -865,31 +865,104 @@ const processUserPayment = async ({ id, productID, amount, token }) => {
     const getUserPlan = await Plans.findOne({ _id: productID });
     const getUser = await getUserData(id);
 
-    try {
-      let makePayment = await Stripe.charges.create({
-        source: token,
-        amount: amount * 100,
-        currency: "usd",
-      });
+    if (getUserPlan && getUser) {
+      try {
+        let makePayment = await Stripe.charges.create({
+          source: token,
+          amount: getUserPlan.price * 100,
+          currency: "usd",
+        });
 
-      console.log(makePayment);
-      if (makePayment.id) {
-        return {
-          status: true,
-          message: "Payment made successfully",
-        };
-      } else {
+        if (makePayment.id) {
+          const updateUserPlan = await User.findByIdAndUpdate(
+            id,
+            {
+              plan: productID,
+              numberOfConverts: getUserPlan.numberOfConverts,
+            },
+            {
+              new: true,
+            }
+          );
+
+          if (updateUserPlan) {
+            return {
+              status: true,
+              message: "Payment made successfully",
+            };
+          } else {
+            return {
+              status: false,
+              message: "Payment failed please try again later",
+            };
+          }
+        } else {
+          return {
+            status: false,
+            message: "Payment failed please try again later",
+          };
+        }
+      } catch (error) {
         return {
           status: false,
           message: "Payment failed please try again later",
         };
       }
-    } catch (error) {
+    } else {
       return {
         status: false,
         message: "Payment failed please try again later",
       };
     }
+  }
+};
+
+const processPaypalPayment = async (userId, planId) => {
+  if (userId !== "" && planId !== "") {
+    const getUserPlan = await Plans.findOne({ _id: planId });
+    const getUser = await getUserData(userId);
+
+    if (getUserPlan && getUser) {
+      try {
+        const updateUserPlan = await User.findByIdAndUpdate(
+          userId,
+          {
+            plan: planId,
+            numberOfConverts: getUserPlan.numberOfConverts,
+          },
+          {
+            new: true,
+          }
+        );
+
+        if (updateUserPlan) {
+          return {
+            status: true,
+            message: "Payment made successfully",
+          };
+        } else {
+          return {
+            status: false,
+            message: "Payment failed please try again later",
+          };
+        }
+      } catch (error) {
+        return {
+          status: false,
+          message: "Payment failed please try again later",
+        };
+      }
+    } else {
+      return {
+        status: false,
+        message: "Payment failed please try again later",
+      };
+    }
+  } else {
+    return {
+      status: false,
+      message: "Payment failed please try again later",
+    };
   }
 };
 
@@ -908,4 +981,5 @@ module.exports = {
   updateProfile,
   updatePassword,
   processUserPayment,
+  processPaypalPayment,
 };

@@ -59,8 +59,15 @@ const getAllPlans = async () => {
   return getAllPlans;
 };
 
+const getUserPlan = async (id) => {
+  if (id) {
+    return await Plans.findOne({ _id: id });
+  }
+};
+
 module.exports = {
   createPlan,
   getPlan,
   getAllPlans,
+  getUserPlan,
 };

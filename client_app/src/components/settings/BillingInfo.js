@@ -7,6 +7,7 @@ import { USER_PAYMENT } from "../../Graphql/mutations";
 import { ToastContainer } from "react-toastify";
 import StripeCheckout from "react-stripe-checkout";
 import { useAuth } from "../../context/AuthContext";
+import PaypalButton from "./PaypalButton";
 const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
   const [billingTabState, setBillingSTate] = useState({
     creditCard: false,
@@ -417,19 +418,25 @@ const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
               <i className="mdi mdi-lock-outline mr-1"></i> PAY NOW
             </button> */}
 
-            <div className="flex items-center justify-center">
-              <StripeCheckout
-                className="block w-full max-w-xs mx-auto bg-brightRed hover:bg-brightRedLight text-white rounded-lg px-3 py-3 font-semibold"
-                stripeKey={process.env.REACT_APP_PUBLISHABLE_KEY}
-                label="Pay Now"
-                name="Pay Now"
-                // billingAddress
-                // shippingAddress
-                amount={priceForStripe}
-                description={`Your total is $${billingData.price}`}
-                token={payNow}
-              />
-            </div>
+            {billingTabState.creditCard ? (
+              <div className="flex items-center justify-center">
+                <StripeCheckout
+                  className="block w-full max-w-xs mx-auto bg-brightRed hover:bg-brightRedLight text-white rounded-lg px-3 py-3 font-semibold"
+                  stripeKey={process.env.REACT_APP_PUBLISHABLE_KEY}
+                  label="Pay Now"
+                  name="Pay Now"
+                  // billingAddress
+                  // shippingAddress
+                  amount={priceForStripe}
+                  description={`Your total is $${billingData.price}`}
+                  token={payNow}
+                />
+              </div>
+            ) : billingTabState.payPal ? (
+              <div className="flex items-center justify-center">
+                <PaypalButton billingData={billingData} />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

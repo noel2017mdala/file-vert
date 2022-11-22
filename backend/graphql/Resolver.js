@@ -9,8 +9,13 @@ const {
   updateProfile,
   updatePassword,
   processUserPayment,
+  processPaypalPayment,
 } = require("../DB/Model/UserModel");
-const { createPlan, getAllPlans } = require("../DB/Model/PlansModel");
+const {
+  createPlan,
+  getAllPlans,
+  getUserPlan,
+} = require("../DB/Model/PlansModel");
 const { AddDays } = require("../helper/getTime");
 
 const rootResolver = {
@@ -151,6 +156,14 @@ const rootResolver = {
 
   processPayment: async ({ id, amount, productID, token }, args, context) => {
     return processUserPayment({ id, amount, productID, token });
+  },
+
+  getUserPlan: async ({ id }, args, context) => {
+    return getUserPlan(id);
+  },
+
+  paypalPayment: async ({ userId, planId }, args, context) => {
+    return processPaypalPayment(userId, planId);
   },
 };
 

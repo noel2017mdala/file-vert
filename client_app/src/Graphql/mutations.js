@@ -83,7 +83,21 @@ export const UPDATE_USER_PASSWORD = gql`
 
 export const USER_PAYMENT = gql`
   mutation ($id: ID, $amount: String, $productID: ID, $token: String) {
-    processPayment(id: $id, amount: $amount, productID: $productID, token: $token) {
+    processPayment(
+      id: $id
+      amount: $amount
+      productID: $productID
+      token: $token
+    ) {
+      status
+      message
+    }
+  }
+`;
+
+export const USER_PAYMENT_PAYPAL = gql`
+  mutation ($userId: ID, $planId: ID) {
+    paypalPayment(userId: $userId, planId: $planId) {
       status
       message
     }

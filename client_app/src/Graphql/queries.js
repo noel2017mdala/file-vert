@@ -14,8 +14,8 @@ export const GET_USER = gql`
     getUser(id: $id) {
       firstName
       lastName
-      email,
-      phoneNumber,
+      email
+      phoneNumber
       userActive
       plan {
         name
@@ -50,6 +50,17 @@ export const FETCH_DATA = gql`
 export const GET_USER_PLANS = gql`
   query {
     getAllPlans {
+      name
+      features
+      price
+      id
+    }
+  }
+`;
+
+export const GET_USER_PLAN = gql`
+  query ($id: ID) {
+    getUserPlan(id: $id) {
       name
       features
       price
