@@ -1,5 +1,6 @@
 const fs = require("fs");
 const mongoose = require("mongoose");
+const moment = require("moment");
 require("dotenv").config();
 const UserSchema = require("../Schema/UsersSchema");
 const PlansSchema = require("../Schema/Plans");
@@ -12,6 +13,7 @@ const axios = require("axios");
 const request = require("request");
 const sendMail = require("../../helper/emailSender");
 const Stripe = require("stripe")(process.env.Stripe_API_KEY);
+const convertTZ = require("../../helper/TimeConverter");
 const {
   generateRefreshToken,
   validateRefreshToken,
@@ -21,7 +23,8 @@ const getFileSizeInBytes = require("../../helper/getFileSize");
 
 const createUser = async (userData) => {
   //destracture the userData input
-  let { firstName, lastName, email, password, phoneNumber } = userData;
+  let { firstName, lastName, email, password, phoneNumber, timeZone } =
+    userData;
 
   //check to see if the values are present
   if (
@@ -29,7 +32,8 @@ const createUser = async (userData) => {
     lastName !== "" &&
     email !== "" &&
     password !== "" &&
-    phoneNumber !== ""
+    phoneNumber !== "" &&
+    timeZone !== ""
   ) {
     //check if the user already exists in the database
     let checkIfUserExists = await User.findOne({
@@ -45,6 +49,7 @@ const createUser = async (userData) => {
           password: await bcrypt.hash(password, 12),
           plan: getFreePlan._id,
           numberOfConverts: getFreePlan.numberOfConverts,
+          userTimezone: timeZone,
         });
 
         //create user
@@ -861,9 +866,39 @@ const updatePassword = async ({
 };
 
 const processUserPayment = async ({ id, productID, amount, token }) => {
+  // let getTimeZone =
+  //   Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // const date = new Date();
+  // console.log(convertTZ(date, getTimeZone));
+  // const timeZOneDate = convertTZ(date, getTimeZone);
+  // const unixTime = moment(timeZOneDate).unix();
+  // console.log(`Subscription date: ${unixTime}`);
+
+  // var today = new Date();
+  // var nestDate = new Date(
+  //   new Date().setDate(today.getDate() + 30)
+  // );
+
+  // const newDate = convertTZ(nestDate, getTimeZone);
+  // const newUnixTime = moment(newDate).unix();
+  // console.log(`Subscription end date: ${newUnixTime}`);
+  // console.log(unixTime >= newUnixTime);
+
   if (id !== "" && productID !== "" && amount !== "") {
     const getUserPlan = await Plans.findOne({ _id: productID });
     const getUser = await getUserData(id);
+
+    const date = new Date();
+    const timeZoneDate = convertTZ(date, getUser.userTimezone);
+
+    const subscriptionUnixTime = moment(timeZoneDate).unix();
+
+    var today = new Date();
+    var nextSubscriptionDate = new Date(
+      new Date().setDate(today.getDate() + 30)
+    );
+    const newDate = convertTZ(nextSubscriptionDate, getUser.userTimezone);
+    const endSubscriptionDate = moment(newDate).unix();
 
     if (getUserPlan && getUser) {
       try {
@@ -879,6 +914,10 @@ const processUserPayment = async ({ id, productID, amount, token }) => {
             {
               plan: productID,
               numberOfConverts: getUserPlan.numberOfConverts,
+              subscription: {
+                subscriptionDate: subscriptionUnixTime,
+                endSubscription: endSubscriptionDate,
+              },
             },
             {
               new: true,
@@ -922,6 +961,18 @@ const processPaypalPayment = async (userId, planId) => {
     const getUserPlan = await Plans.findOne({ _id: planId });
     const getUser = await getUserData(userId);
 
+    const date = new Date();
+    const timeZoneDate = convertTZ(date, getUser.userTimezone);
+
+    const subscriptionUnixTime = moment(timeZoneDate).unix();
+
+    var today = new Date();
+    var nextSubscriptionDate = new Date(
+      new Date().setDate(today.getDate() + 30)
+    );
+    const newDate = convertTZ(nextSubscriptionDate, getUser.userTimezone);
+    const endSubscriptionDate = moment(newDate).unix();
+
     if (getUserPlan && getUser) {
       try {
         const updateUserPlan = await User.findByIdAndUpdate(
@@ -929,6 +980,10 @@ const processPaypalPayment = async (userId, planId) => {
           {
             plan: planId,
             numberOfConverts: getUserPlan.numberOfConverts,
+            subscription: {
+              subscriptionDate: subscriptionUnixTime,
+              endSubscription: endSubscriptionDate,
+            },
           },
           {
             new: true,
@@ -966,6 +1021,17 @@ const processPaypalPayment = async (userId, planId) => {
   }
 };
 
+const getUserExp = async () => {
+  const date = new Date();
+  const timeZoneDate = convertTZ(date, "Africa/Blantyre");
+  const subscriptionUnixTime = moment(timeZoneDate).unix();
+  const getExpSub = await   User.find({
+    "subscription.subscriptionDate": { $lte: subscriptionUnixTime },
+  });
+
+  console.log(getExpSub);
+};
+
 module.exports = {
   createUser,
   login,
@@ -982,4 +1048,5 @@ module.exports = {
   updatePassword,
   processUserPayment,
   processPaypalPayment,
+  getUserExp,
 };

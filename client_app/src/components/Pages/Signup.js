@@ -429,6 +429,8 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   phoneNumberErr: false,
                 });
               } else {
+                let getTimeZone =
+                  Intl.DateTimeFormat().resolvedOptions().timeZone;
                 let createUserData = await createUser({
                   input: {
                     firstName,
@@ -436,6 +438,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                     email,
                     phoneNumber: phoneNumber.substring(1),
                     password,
+                    timeZone: getTimeZone,
                   },
                 });
 

@@ -46,6 +46,15 @@ const User = new Schema({
     required: true,
   },
 
+  userTimezone: {
+    type: String,
+    required: true,
+  },
+
+  subscription: {
+    type: Object,
+  },
+
   plan: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Plans",

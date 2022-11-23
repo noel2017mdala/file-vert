@@ -68,3 +68,10 @@ export const GET_USER_PLAN = gql`
     }
   }
 `;
+export const GET_EXP_USER_PLAN = gql`
+  query {
+    getExpUserPlan {
+      status
+    }
+  }
+`;

@@ -1,12 +1,22 @@
 import { useState } from "react";
-import { GET_USER_PLANS } from "../../Graphql/queries";
+import { GET_USER_PLANS, GET_EXP_USER_PLAN } from "../../Graphql/queries";
+import { convertTZ } from "../../helper/TimeConverter";
 import { useGQLQuery } from "../../hooks/useGqlQueries";
 import BillingInfo from "./BillingInfo";
+import Moment from "react-moment";
+import * as moment from "moment";
 const Billing = ({ userData }) => {
   const { data, isLoading, error } = useGQLQuery(
     "get_user_plans",
     GET_USER_PLANS
   );
+
+  const {
+    data: userPlanData,
+    isLoading: loader,
+    error: userErr,
+    refetch,
+  } = useGQLQuery("get_exp_user_plan", GET_EXP_USER_PLAN);
 
   const [selectedCard, setSelectedCard] = useState();
   const [billingInfo, setBillingInfo] = useState({
@@ -49,6 +59,7 @@ const Billing = ({ userData }) => {
                   <button
                     className="py-2 px-4 rounded-xl border border-gray-400 text-sm capitalize"
                     onClick={() => {
+                      refetch();
                       setSelectedCard(undefined);
                     }}
                   >

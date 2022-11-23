@@ -8,12 +8,14 @@ const schema = require("./graphql/Schema");
 const rootResolver = require("./graphql/Resolver");
 const cookieParser = require("cookie-parser");
 const demoMiddleWare = require("./middleware/demoMiddleWare");
+const schedule = require("node-schedule");
 const {
   uploadFileConvert,
   getFileStatus,
   downloadFile,
   getUserData,
   updateConverts,
+  getUserExp
 } = require("./DB/Model/UserModel");
 
 const app = express();
@@ -21,6 +23,11 @@ const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 const port = process.env.PORT || 8000;
 let fileSize;
+
+// const job = schedule.scheduleJob("*/5 * * * * *", () => {
+//   getUserExp();
+// });
+//0 0 * * *
 
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {

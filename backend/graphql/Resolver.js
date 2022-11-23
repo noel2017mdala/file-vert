@@ -10,6 +10,7 @@ const {
   updatePassword,
   processUserPayment,
   processPaypalPayment,
+  getUserExp,
 } = require("../DB/Model/UserModel");
 const {
   createPlan,
@@ -164,6 +165,10 @@ const rootResolver = {
 
   paypalPayment: async ({ userId, planId }, args, context) => {
     return processPaypalPayment(userId, planId);
+  },
+
+  getExpUserPlan: async () => {
+    getUserExp();
   },
 };
 

@@ -50,6 +50,7 @@ type Query{
    # getUsers: [User],
     getAllPlans: [Plans]
     getUserPlan(id: ID): Plans
+    getExpUserPlan: Response
 }
 
 
@@ -73,6 +74,7 @@ input UserInput{
     email: String,
     phoneNumber: String,
     password: String
+    timeZone: String,
 }
 
 input planInput{
