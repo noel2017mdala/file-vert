@@ -3,8 +3,9 @@ import { GET_USER_PLANS, GET_EXP_USER_PLAN } from "../../Graphql/queries";
 import { convertTZ } from "../../helper/TimeConverter";
 import { useGQLQuery } from "../../hooks/useGqlQueries";
 import BillingInfo from "./BillingInfo";
-import Moment from "react-moment";
 import * as moment from "moment";
+import { ToastContainer } from "react-toastify";
+import { notify } from "../../helper/notification";
 const Billing = ({ userData }) => {
   const { data, isLoading, error } = useGQLQuery(
     "get_user_plans",
@@ -44,13 +45,16 @@ const Billing = ({ userData }) => {
                     className="py-2 px-4 rounded-xl bg-brightRed hover:bg-brightRedLight text-white text-sm capitalize"
                     onClick={() => {
                       if (selectedCard) {
-                        // console.log(selectedCard);
-                        setBillingInfo({
-                          billing: false,
-                          billingInfo: true,
-                        });
+                        if (selectedCard.name === "free") {
+                          console.log("free subscription to be active active");
+                        } else {
+                          setBillingInfo({
+                            billing: false,
+                            billingInfo: true,
+                          });
+                        }
                       } else {
-                        console.log("please select your plan");
+                        notify.fail("please select your plan");
                       }
                     }}
                   >
@@ -59,7 +63,7 @@ const Billing = ({ userData }) => {
                   <button
                     className="py-2 px-4 rounded-xl border border-gray-400 text-sm capitalize"
                     onClick={() => {
-                      refetch();
+                      // refetch();
                       setSelectedCard(undefined);
                     }}
                   >
@@ -134,9 +138,7 @@ const Billing = ({ userData }) => {
                             : "bg-brightRed"
                         } hover:bg-brightRedLight focus:ring-4 focus:outline-none focus:ring-blue-200 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center shadow-md ${
                           userData.getUser.plan.name === plan.name
-                            ? {
-                                cursor: "not-allowed",
-                              }
+                            ? "cursor-not-allowed"
                             : ""
                         }`}
                         onClick={() => {
@@ -166,8 +168,11 @@ const Billing = ({ userData }) => {
           billingData={selectedCard}
           billingTabs={billingInfo}
           setBilling={setBillingInfo}
+          billingCard={setSelectedCard}
         />
       ) : null}
+
+      <ToastContainer />
     </>
   );
 };

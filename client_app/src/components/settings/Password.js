@@ -51,11 +51,7 @@ const Password = () => {
             <div className="flex space-x-4">
               <button
                 className={`py-2 px-4 rounded-xl bg-brightRed hover:bg-brightRedLight text-white text-sm capitalize ${
-                  loader
-                    ? {
-                        cursor: "not-allowed",
-                      }
-                    : ""
+                  loader ? "cursor-not-allowed" : ""
                 }`}
                 onClick={async (e) => {
                   setLoader(true);

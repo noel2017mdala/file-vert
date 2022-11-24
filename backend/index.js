@@ -15,7 +15,7 @@ const {
   downloadFile,
   getUserData,
   updateConverts,
-  getUserExp
+  getUserExp,
 } = require("./DB/Model/UserModel");
 
 const app = express();
@@ -117,6 +117,7 @@ app.put("/upload/:id", upload.single("file"), async (req, res) => {
 
         let getConvertStatus = setInterval(async () => {
           let getUploadStatus = await getFileStatus(processId);
+          console.log(getUploadStatus);
 
           if (getUploadStatus && getUploadStatus.status) {
             if (getUploadStatus.status === "successful") {
@@ -141,6 +142,7 @@ app.put("/upload/:id", upload.single("file"), async (req, res) => {
               }
             }
           } else {
+            clearInterval(getConvertStatus);
             console.log("failed");
           }
         }, 1000);

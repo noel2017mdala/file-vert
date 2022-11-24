@@ -570,6 +570,7 @@ const uploadFileConvert = async (path, ext, user, cb) => {
         });
       }
     } else if (user.plan.name === "professional") {
+      console.log("here");
       //1 GB
       if (getFieSize <= 1073741824) {
         let formData = {
@@ -585,7 +586,11 @@ const uploadFileConvert = async (path, ext, user, cb) => {
                 cb({ response: err, status: false });
               } else {
                 let response = JSON.parse(body);
-                cb({ response, status: true });
+                if (response.errors) {
+                  cb({ response: response.errors, status: false });
+                } else {
+                  cb({ response, status: true });
+                }
               }
             }
           )
@@ -658,7 +663,6 @@ const uploadFileConvert = async (path, ext, user, cb) => {
 
 const getFileStatus = async (jobId) => {
   // console.log("wawawwwawa");
-  // console.log(jobId);
 
   if (jobId) {
     let url = `https://sandbox.zamzar.com/v1/jobs/${jobId}`;
@@ -1025,11 +1029,11 @@ const getUserExp = async () => {
   const date = new Date();
   const timeZoneDate = convertTZ(date, "Africa/Blantyre");
   const subscriptionUnixTime = moment(timeZoneDate).unix();
-  const getExpSub = await   User.find({
+  const getExpSub = await User.find({
     "subscription.subscriptionDate": { $lte: subscriptionUnixTime },
   });
 
-  console.log(getExpSub);
+  // console.log(getExpSub);
 };
 
 module.exports = {

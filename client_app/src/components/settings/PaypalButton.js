@@ -79,7 +79,7 @@ const PaypalButton = ({ billingData }) => {
             Swal.fire({
               icon: "error",
               title: `Payment`,
-              text: "An error occurred while processing your payment please try again",
+              text: "Failed to make payment please try again later",
               confirmButtonColor: "#F25F3A",
             });
           }

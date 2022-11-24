@@ -8,7 +8,12 @@ import { ToastContainer } from "react-toastify";
 import StripeCheckout from "react-stripe-checkout";
 import { useAuth } from "../../context/AuthContext";
 import PaypalButton from "./PaypalButton";
-const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
+import ClipLoader from "react-spinners/ClipLoader";
+import { css } from "@emotion/react";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const BillingInfo = ({ billingData, billingTabs, setBilling, billingCard }) => {
   const [billingTabState, setBillingSTate] = useState({
     creditCard: false,
     payPal: false,
@@ -26,6 +31,8 @@ const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
     cvcErr: false,
   });
 
+  const [loader, setLoader] = useState(false);
+
   const { currentUser, socket } = useAuth();
 
   const priceForStripe = billingData.price * 100;
@@ -36,7 +43,13 @@ const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
     },
   });
 
+  const override = css`
+    display: block;
+    border-color: #00bfa5;
+  `;
+
   const payNow = async (token) => {
+    setLoader(true);
     const userPayment = await proceedPayment({
       id: currentUser.user.id,
       amount: billingData.price,
@@ -44,7 +57,25 @@ const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
       token: token.id,
     });
 
-    console.log(userPayment);
+    if (userPayment && userPayment.processPayment) {
+      // notify.success(userPayment.processPayment.message);
+      Swal.fire({
+        icon: "success",
+        title: `Payment`,
+        text: userPayment.processPayment.message,
+        confirmButtonColor: "#F25F3A",
+      });
+      setLoader(false);
+    } else {
+      // notify.fail("Failed to make payment please try again later");
+      Swal.fire({
+        icon: "error",
+        title: `Payment`,
+        text: "Failed to make payment please try again later",
+        confirmButtonColor: "#F25F3A",
+      });
+      setLoader(false);
+    }
   };
   return (
     <div className="mx-2">
@@ -77,13 +108,18 @@ const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
                 Pay
               </button> */}
               <button
-                className="py-2 px-4 rounded-xl border border-gray-400 text-sm capitalize"
+                className={`py-2 px-4 rounded-xl border border-gray-400 text-sm capitalize ${
+                  loader ? "cursor-not-allowed" : ""
+                }`}
                 onClick={() => {
                   setBilling({
                     billing: true,
                     billingInfo: false,
                   });
+
+                  billingCard(undefined);
                 }}
+                disabled={loader ? "disabled" : ""}
               >
                 Back
               </button>
@@ -420,17 +456,26 @@ const BillingInfo = ({ billingData, billingTabs, setBilling }) => {
 
             {billingTabState.creditCard ? (
               <div className="flex items-center justify-center">
-                <StripeCheckout
-                  className="block w-full max-w-xs mx-auto bg-brightRed hover:bg-brightRedLight text-white rounded-lg px-3 py-3 font-semibold"
-                  stripeKey={process.env.REACT_APP_PUBLISHABLE_KEY}
-                  label="Pay Now"
-                  name="Pay Now"
-                  // billingAddress
-                  // shippingAddress
-                  amount={priceForStripe}
-                  description={`Your total is $${billingData.price}`}
-                  token={payNow}
-                />
+                {loader ? (
+                  <ClipLoader
+                    color="#F25F3A"
+                    css={override}
+                    size={15}
+                    className=""
+                  />
+                ) : (
+                  <StripeCheckout
+                    className="block w-full max-w-xs mx-auto bg-brightRed hover:bg-brightRedLight text-white rounded-lg px-3 py-3 font-semibold"
+                    stripeKey={process.env.REACT_APP_PUBLISHABLE_KEY}
+                    label="Pay Now"
+                    name="Pay Now"
+                    // billingAddress
+                    // shippingAddress
+                    amount={priceForStripe}
+                    description={`Your total is $${billingData.price}`}
+                    token={payNow}
+                  />
+                )}
               </div>
             ) : billingTabState.payPal ? (
               <div className="flex items-center justify-center">
