@@ -18,7 +18,7 @@ const Password = () => {
     confirmPasswordErr: false,
   });
 
-  const { currentUser, socket } = useAuth();
+  const { currentUser, socket, userToken, updateToken } = useAuth();
 
   const { mutateAsync: updateUserPassword } = useGQLMutation(
     UPDATE_USER_PASSWORD,
@@ -26,7 +26,9 @@ const Password = () => {
       onSuccess: () => {
         // console.log("user is ready to be logged in");
       },
-    }
+    },
+    userToken,
+    currentUser.user.id
   );
 
   const override = css`
@@ -112,14 +114,17 @@ const Password = () => {
                       updatePassword.updateUserPassword &&
                       updatePassword.updateUserPassword.status
                     ) {
-                      // console.log(updatePassword.updateUserPassword);
+                      if (updatePassword.updateUserPassword.token) {
+                        updateToken(updatePassword.updateUserPassword.token);
+                      }
                       notify.success(updatePassword.updateUserPassword.message);
                       setLoader(false);
                       setPassword("");
                       setConfirmPassword("");
                       setOldPassword("");
                     } else {
-                      notify.fail(updatePassword.updateUserPassword.message);
+                      console.log(updatePassword);
+                      notify.fail("unable to update password");
                       setLoader(false);
                       setPassword("");
                       setConfirmPassword("");

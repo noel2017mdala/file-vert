@@ -18,6 +18,7 @@ const {
   getUserPlan,
 } = require("../DB/Model/PlansModel");
 const { AddDays } = require("../helper/getTime");
+const Auth = require("../middleware/AuthMiddleware");
 
 const rootResolver = {
   createUser: ({ input }) => {
@@ -76,25 +77,34 @@ const rootResolver = {
   },
 
   getUser: async ({ id }, args, context) => {
-    // if (id && id !== "") {
-    //   if (args.request.req["headers"].cookie) {
-    //     let tokens = args.request.req["headers"].cookie.split(";");
-    //     if (tokens.length === 2) {
-    //       let accessToken = tokens[0];
-    //       let refreshToken = tokens[1];
+    const authResponse = await Auth(args);
 
-    //       console.log(accessToken);
-    //       console.log(refreshToken);
-    //     } else {
-    //       // args.request.res.status(403);
-    //     }
-    //   } else {
-    //     console.log("not found");
-    //     // args.request.res.status(403);
-    //   }
-
-    // }
-    return await getUserData(id);
+    //if accessToken and refreshToken are all valid
+    if (
+      authResponse.accessTokenResponse.status &&
+      authResponse.refreshTokenResponse.status
+    ) {
+      const userData = await getUserData(id);
+      userData.response.token = authResponse.token;
+      return userData;
+    } else if (
+      //if refreshToken is valid while access token has expired
+      authResponse.refreshTokenResponse.status &&
+      authResponse.accessTokenResponse.status === undefined &&
+      authResponse.accessTokenResponse.token !== null
+    ) {
+      const userData = await getUserData(id);
+      userData.response.token = authResponse.token;
+      return userData;
+    } else {
+      //if all tokens have expired
+      return {
+        response: {
+          status: false,
+          message: "unauthenticated_user",
+        },
+      };
+    }
   },
 
   tokenRefresh: async ({ id }, args, context) => {
@@ -115,24 +125,52 @@ const rootResolver = {
   },
 
   getFormats: async ({ id, format }, args, context) => {
-    if (id && format) {
+    const authResponse = await Auth(args);
+    if (
+      authResponse.accessTokenResponse.status &&
+      authResponse.refreshTokenResponse.status
+    ) {
+      if (id && format) {
+        let userFormats = await getUserFormats(id, format);
+        userFormats.response.token = authResponse.token;
+        return userFormats;
+      }
+    } else if (
+      authResponse.refreshTokenResponse.status &&
+      authResponse.accessTokenResponse.status === undefined &&
+      authResponse.accessTokenResponse.token !== null
+    ) {
       let userFormats = await getUserFormats(id, format);
+      userFormats.response.token = authResponse.token;
       return userFormats;
+    } else {
+      console.log("wawa token has expired get formats");
     }
   },
 
-  fetchData: async ({ id, format }, args, context) => {
-    testAxios(id, format);
-  },
-
   createPlan: async ({ input }, args, context) => {
-    if (input) {
-      return createPlan(input);
+    const authResponse = await Auth(args);
+    if (
+      authResponse.accessTokenResponse.status &&
+      authResponse.refreshTokenResponse.status
+    ) {
+      if (input) {
+        return createPlan(input);
+      }
     }
   },
 
   updateUserState: async ({ id }, args, context) => {
-    return updateUserActiveState(id);
+    const authResponse = await Auth(args);
+
+    if (
+      authResponse.accessTokenResponse.status &&
+      authResponse.refreshTokenResponse.status
+    ) {
+      return updateUserActiveState(id);
+    } else {
+      console.log("wawa token has expired user state");
+    }
   },
 
   getAllPlans: async () => {
@@ -144,7 +182,29 @@ const rootResolver = {
     args,
     context
   ) => {
-    return updateProfile({ id, firstName, lastName, email });
+    const authResponse = await Auth(args);
+
+    if (
+      authResponse.accessTokenResponse.status &&
+      authResponse.refreshTokenResponse.status
+    ) {
+      let userProfile = await updateProfile({ id, firstName, lastName, email });
+      console.log(userProfile);
+      userProfile.token = authResponse.token;
+
+      return userProfile;
+    } else if (
+      authResponse.refreshTokenResponse.status &&
+      authResponse.accessTokenResponse.status === undefined &&
+      authResponse.accessTokenResponse.token !== null
+    ) {
+      let userProfile = await updateProfile({ id, firstName, lastName, email });
+      userProfile.token = authResponse.token;
+
+      return userProfile;
+    } else {
+      console.log("wawa token has expired profile update");
+    }
   },
 
   updateUserPassword: async (
@@ -152,19 +212,101 @@ const rootResolver = {
     args,
     context
   ) => {
-    return await updatePassword({ id, oldPassword, password, confirmPassword });
+    const authResponse = await Auth(args);
+
+    if (
+      authResponse.accessTokenResponse.status &&
+      authResponse.refreshTokenResponse.status
+    ) {
+      let userPasswordUpdate = await updatePassword({
+        id,
+        oldPassword,
+        password,
+        confirmPassword,
+      });
+
+      userPasswordUpdate.token = authResponse.token;
+      return userPasswordUpdate;
+    } else if (
+      authResponse.refreshTokenResponse.status &&
+      authResponse.accessTokenResponse.status === undefined &&
+      authResponse.accessTokenResponse.token !== null
+    ) {
+      let userPasswordUpdate = await updatePassword({
+        id,
+        oldPassword,
+        password,
+        confirmPassword,
+      });
+
+      console.log(userPasswordUpdate);
+
+      userPasswordUpdate.token = authResponse.token;
+      return userPasswordUpdate;
+    } else {
+      console.log("wawa token has expired update password");
+    }
   },
 
   processPayment: async ({ id, amount, productID, token }, args, context) => {
-    return processUserPayment({ id, amount, productID, token });
+    const authResponse = await Auth(args);
+
+    if (
+      authResponse.accessTokenResponse.status &&
+      authResponse.refreshTokenResponse.status
+    ) {
+      let userPayment = await processUserPayment({
+        id,
+        amount,
+        productID,
+        token,
+      });
+      userPayment.token = authResponse.token;
+      return userPayment;
+    } else if (
+      authResponse.refreshTokenResponse.status &&
+      authResponse.accessTokenResponse.status === undefined &&
+      authResponse.accessTokenResponse.token !== null
+    ) {
+      let userPayment = await processUserPayment({
+        id,
+        amount,
+        productID,
+        token,
+      });
+      userPayment.token = authResponse.token;
+      return userPayment;
+    } else {
+      console.log("wawa token has expired process payment");
+    }
   },
 
   getUserPlan: async ({ id }, args, context) => {
+    console.log("plans");
     return getUserPlan(id);
   },
 
   paypalPayment: async ({ userId, planId }, args, context) => {
-    return processPaypalPayment(userId, planId);
+    const authResponse = await Auth(args);
+
+    if (
+      authResponse.accessTokenResponse.status &&
+      authResponse.refreshTokenResponse.status
+    ) {
+      let payPalPayment = processPaypalPayment(userId, planId);
+      payPalPayment.token = authResponse.token;
+      return payPalPayment;
+    } else if (
+      authResponse.refreshTokenResponse.status &&
+      authResponse.accessTokenResponse.status === undefined &&
+      authResponse.accessTokenResponse.token !== null
+    ) {
+      let payPalPayment = processPaypalPayment(userId, planId);
+      payPalPayment.token = authResponse.token;
+      return payPalPayment;
+    } else {
+      console.log("wawa token has expired paypal");
+    }
   },
 
   getExpUserPlan: async () => {

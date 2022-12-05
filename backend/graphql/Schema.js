@@ -10,11 +10,13 @@ type User{
     password: String,
     userActive: Boolean,
     plan: Plans,
+    response: Response,
 }
 
 type Response{
     status: Boolean,
-    message: String
+    message: String,
+    token: String
 }
 
 type LoginResponse {

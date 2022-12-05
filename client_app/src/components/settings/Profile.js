@@ -4,6 +4,8 @@ import { notify } from "../../helper/notification";
 import { ToastContainer } from "react-toastify";
 import { UPDATE_USER_PROFILE } from "../../Graphql/mutations";
 import { useGQLMutation } from "../../hooks/useGqlMutations";
+import { GET_USER } from "../../Graphql/queries";
+import { useGQLQuery } from "../../hooks/useGqlQueries";
 import { useAuth } from "../../context/AuthContext";
 import validateEmail from "../../helper/emailValidator";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -22,14 +24,37 @@ const Profile = ({ userData }) => {
     phoneNumberErr: false,
   });
 
-  const { currentUser, socket } = useAuth();
+  const { currentUser, socket, userToken, updateToken } = useAuth();
+
+  const {
+    data: user_Data,
+    isLoading: userLoading,
+    error: userError,
+  } = useGQLQuery(
+    "get_user",
+    GET_USER,
+    {
+      id: currentUser.user.id,
+    },
+    {},
+    userToken,
+    currentUser.user.id
+  );
+
   useEffect(() => {
+    if (!userLoading && user_Data.getUser) {
+      if (user_Data.getUser.response.token === null) {
+        // console.log("token active");
+      } else {
+        // console.log(user_Data.getUser.response.token);
+        updateToken(user_Data.getUser.response.token);
+      }
+    }
+
     if (userData && userData.getUser) {
       setFirstName(userData.getUser.firstName);
       setLastName(userData.getUser.lastName);
       setEmail(userData.getUser.email);
-      // let contactNumber = userData.getUser.phoneNumber.slice(3, userData.getUser.phoneNumber.length);
-      // setPhoneNumber(contactNumber);
     }
   }, [userData]);
 
@@ -39,7 +64,9 @@ const Profile = ({ userData }) => {
       onSuccess: () => {
         // console.log("user is ready to be logged in");
       },
-    }
+    },
+    userToken,
+    currentUser.user.id
   );
 
   const override = css`
@@ -118,6 +145,10 @@ const Profile = ({ userData }) => {
                       lastName,
                       email,
                     });
+
+                    if (updateProfile.updateUserProfile.token) {
+                      updateToken(updateProfile.updateUserProfile.token);
+                    }
                     if (
                       updateProfile.updateUserProfile &&
                       updateProfile.updateUserProfile.status

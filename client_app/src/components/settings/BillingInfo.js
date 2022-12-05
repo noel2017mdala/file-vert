@@ -33,7 +33,7 @@ const BillingInfo = ({ billingData, billingTabs, setBilling, billingCard }) => {
 
   const [loader, setLoader] = useState(false);
 
-  const { currentUser, socket } = useAuth();
+  const { currentUser, socket, userToken } = useAuth();
 
   const priceForStripe = billingData.price * 100;
 
@@ -41,7 +41,7 @@ const BillingInfo = ({ billingData, billingTabs, setBilling, billingCard }) => {
     onSuccess: () => {
       // console.log("user is ready to be logged in");
     },
-  });
+  }, userToken, currentUser.user.id);
 
   const override = css`
     display: block;

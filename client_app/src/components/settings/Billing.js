@@ -6,7 +6,10 @@ import BillingInfo from "./BillingInfo";
 import * as moment from "moment";
 import { ToastContainer } from "react-toastify";
 import { notify } from "../../helper/notification";
+import { useAuth } from "../../context/AuthContext";
 const Billing = ({ userData }) => {
+  const { currentUser, socket, userToken } = useAuth();
+
   const { data, isLoading, error } = useGQLQuery(
     "get_user_plans",
     GET_USER_PLANS
@@ -17,7 +20,16 @@ const Billing = ({ userData }) => {
     isLoading: loader,
     error: userErr,
     refetch,
-  } = useGQLQuery("get_exp_user_plan", GET_EXP_USER_PLAN);
+  } = useGQLQuery(
+    "get_exp_user_plan",
+    GET_EXP_USER_PLAN,
+    {
+      id: currentUser.user.id,
+    },
+    {},
+    userToken,
+    currentUser.user.id
+  );
 
   const [selectedCard, setSelectedCard] = useState();
   const [billingInfo, setBillingInfo] = useState({

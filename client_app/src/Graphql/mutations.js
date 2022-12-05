@@ -44,6 +44,7 @@ export const UPDATE_USER_ACTIVE = gql`
     updateUserState(id: $id) {
       status
       message
+      token
     }
   }
 `;
@@ -58,6 +59,7 @@ export const UPDATE_USER_PROFILE = gql`
     ) {
       status
       message
+      token
     }
   }
 `;
@@ -77,6 +79,7 @@ export const UPDATE_USER_PASSWORD = gql`
     ) {
       status
       message
+      token
     }
   }
 `;
@@ -91,6 +94,7 @@ export const USER_PAYMENT = gql`
     ) {
       status
       message
+      token
     }
   }
 `;
@@ -100,6 +104,7 @@ export const USER_PAYMENT_PAYPAL = gql`
     paypalPayment(userId: $userId, planId: $planId) {
       status
       message
+      token
     }
   }
 `;

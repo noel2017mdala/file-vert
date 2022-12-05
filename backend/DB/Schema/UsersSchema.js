@@ -59,6 +59,10 @@ const User = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Plans",
   },
+
+  userSocket: {
+    type: String,
+  },
 });
 
 User.virtual("id").get(function () {

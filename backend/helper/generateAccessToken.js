@@ -15,7 +15,7 @@ const generateRefreshToken = async (userId) => {
 };
 
 const generateAccessToken = async (id) => {
-  let getSecret = process.env.REFRESH_TOKEN_SECRET;
+  let getSecret = process.env.TOKEN_SECRET;
   // const token = await jwt.sign(
   //   {
   //     userId: userId.toHexString(),
@@ -32,7 +32,7 @@ const generateAccessToken = async (id) => {
     },
     getSecret,
     {
-      expiresIn: "15m",
+      expiresIn: "1m",
     }
   );
   return token;
@@ -68,4 +68,8 @@ const validateRefreshToken = async (userId, refreshToken) => {
     }
   });
 };
-module.exports = { generateRefreshToken, validateRefreshToken };
+module.exports = {
+  generateRefreshToken,
+  validateRefreshToken,
+  generateAccessToken,
+};

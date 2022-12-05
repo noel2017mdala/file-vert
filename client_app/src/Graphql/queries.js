@@ -5,6 +5,7 @@ export const GET_USERS = gql`
     getUsers {
       firstName
       lastName
+      response
     }
   }
 `;
@@ -20,6 +21,11 @@ export const GET_USER = gql`
       plan {
         name
       }
+      response {
+        message
+        status
+        token
+      }
     }
   }
 `;
@@ -31,6 +37,7 @@ export const GET_FORMATS = gql`
       response {
         status
         message
+        token
       }
     }
   }

@@ -174,7 +174,14 @@ const getUserData = async (userId) => {
   if (userId && userId !== "") {
     let getUserData = await User.findById(userId).populate("plan");
     if (getUserData) {
-      return getUserData;
+      let returnData = {
+        ...getUserData._doc,
+        response: {
+          status: true,
+          message: "",
+        },
+      };
+      return returnData;
     }
   }
 };
@@ -229,19 +236,6 @@ const refreshToken = async (id, refreshToken) => {
 const getUserFormats = async (id, format) => {
   if (id && format) {
     let getUser = await getUserData(id);
-    // console.log(getUser);
-    // return;
-    // console.log(getUser);
-    //professional and enterprise
-    // let userFormats = await testAxios("", format);
-    // let convertFormat = [];
-    // userFormats.targets.map((data) => {
-    //   convertFormat.push(data.name);
-    // });
-
-    // console.log(convertFormat);
-    // return;
-
     if (getUser) {
       if (getUser.numberOfConverts >= 1) {
         if (getUser.plan.name === "free") {
@@ -367,20 +361,31 @@ const getUserFormats = async (id, format) => {
           getUser.plan.name === "enterprise"
         ) {
           //professional and enterprise
-          let userFormats = await testAxios("", format);
-          let convertFormat = [];
-          userFormats.targets.map((data) => {
-            convertFormat.push(data.name);
-          });
-          if (convertFormat.length > 0) {
-            return {
-              format: convertFormat,
-              response: {
-                status: true,
-                message: "file extension",
-              },
-            };
-          } else {
+          try {
+            let userFormats = await testAxios("", format);
+            let convertFormat = [];
+            userFormats.targets.map((data) => {
+              convertFormat.push(data.name);
+            });
+            if (convertFormat.length > 0) {
+              return {
+                format: convertFormat,
+                response: {
+                  status: true,
+                  message: "file extension",
+                },
+              };
+            } else {
+              return {
+                response: {
+                  status: false,
+                  message:
+                    "failed to get file extensions please try again later",
+                },
+                format: null,
+              };
+            }
+          } catch (error) {
             return {
               response: {
                 status: false,
@@ -471,19 +476,6 @@ const getUserFormats = async (id, format) => {
 };
 
 const testAxios = async (id, format) => {
-  // let data = await axios.get(
-  //   "https://sandbox.zamzar.com/v1/formats/gif",
-  //   {},
-  //   {
-  //     auth: {
-  //       username: "558686f9377507c05f3d7845b80d64a364578227",
-  //       password: "",
-  //     },
-  //   }
-  // );
-
-  // console.log(data);
-
   let url = `https://sandbox.zamzar.com/v1/formats/${format}`;
   let data = await axios({
     method: "get",
@@ -494,14 +486,29 @@ const testAxios = async (id, format) => {
     },
   });
 
-  // console.log(data);
-
   return data.data;
 };
 
+const updateUserSocket = async (userId, userSocket) => {
+  if (userId !== "null" && userSocket !== "") {
+    const updateSocket = await User.findByIdAndUpdate(
+      userId,
+      {
+        userSocket: userSocket,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (updateSocket) {
+      console.log(`socket updated`);
+    }
+  }
+};
 const uploadFileConvert = async (path, ext, user, cb) => {
   const getFieSize = await getFileSizeInBytes(path);
-  // console.log(getFieSize);
+  // console.log(user);
   if (user) {
     if (user.plan.name === "free") {
       //1 MB
@@ -525,7 +532,11 @@ const uploadFileConvert = async (path, ext, user, cb) => {
                 });
               } else {
                 let response = JSON.parse(body);
-                cb({ response, status: true });
+                if (response.errors) {
+                  cb({ response: response.errors, status: false });
+                } else {
+                  cb({ response, status: true });
+                }
               }
             }
           )
@@ -553,9 +564,15 @@ const uploadFileConvert = async (path, ext, user, cb) => {
             function (err, response, body) {
               if (err) {
                 cb({ response: err, status: false });
+                fs.unlinkSync(path);
               } else {
                 let response = JSON.parse(body);
-                cb({ response, status: true });
+                if (response.errors) {
+                  cb({ response: response.errors, status: false });
+                } else {
+                  cb({ response, status: true });
+                }
+                fs.unlinkSync(path);
               }
             }
           )
@@ -570,7 +587,6 @@ const uploadFileConvert = async (path, ext, user, cb) => {
         });
       }
     } else if (user.plan.name === "professional") {
-      console.log("here");
       //1 GB
       if (getFieSize <= 1073741824) {
         let formData = {
@@ -584,13 +600,16 @@ const uploadFileConvert = async (path, ext, user, cb) => {
             function (err, response, body) {
               if (err) {
                 cb({ response: err, status: false });
+                fs.unlinkSync(path);
               } else {
                 let response = JSON.parse(body);
+
                 if (response.errors) {
                   cb({ response: response.errors, status: false });
                 } else {
-                  cb({ response, status: true });
+                  cb({ response: response, status: true });
                 }
+                fs.unlinkSync(path);
               }
             }
           )
@@ -618,9 +637,15 @@ const uploadFileConvert = async (path, ext, user, cb) => {
             function (err, response, body) {
               if (err) {
                 cb({ response: err, status: false });
+                fs.unlinkSync(path);
               } else {
                 let response = JSON.parse(body);
-                cb({ response, status: true });
+                if (response.errors) {
+                  cb({ response: response.errors, status: false });
+                } else {
+                  cb({ response, status: true });
+                }
+                fs.unlinkSync(path);
               }
             }
           )
@@ -831,8 +856,6 @@ const updatePassword = async ({
         (await bcrypt.compare(oldPassword, getUser.password)) &&
         password === confirmPassword
       ) {
-        console.log(getUser);
-
         const updateUserPassword = await User.findByIdAndUpdate(
           id,
           {
@@ -870,24 +893,6 @@ const updatePassword = async ({
 };
 
 const processUserPayment = async ({ id, productID, amount, token }) => {
-  // let getTimeZone =
-  //   Intl.DateTimeFormat().resolvedOptions().timeZone;
-  // const date = new Date();
-  // console.log(convertTZ(date, getTimeZone));
-  // const timeZOneDate = convertTZ(date, getTimeZone);
-  // const unixTime = moment(timeZOneDate).unix();
-  // console.log(`Subscription date: ${unixTime}`);
-
-  // var today = new Date();
-  // var nestDate = new Date(
-  //   new Date().setDate(today.getDate() + 30)
-  // );
-
-  // const newDate = convertTZ(nestDate, getTimeZone);
-  // const newUnixTime = moment(newDate).unix();
-  // console.log(`Subscription end date: ${newUnixTime}`);
-  // console.log(unixTime >= newUnixTime);
-
   if (id !== "" && productID !== "" && amount !== "") {
     const getUserPlan = await Plans.findOne({ _id: productID });
     const getUser = await getUserData(id);
@@ -956,6 +961,31 @@ const processUserPayment = async ({ id, productID, amount, token }) => {
         status: false,
         message: "Payment failed please try again later",
       };
+    }
+  }
+};
+
+const userSubExp = async (id) => {
+  if (id) {
+    try {
+      const updateUserPlan = await User.findByIdAndUpdate(
+        id,
+        {
+          plan: "636517aed4712f9c7ae23f16",
+          numberOfConverts: 0,
+          // subscription: {
+          //   subscriptionDate: subscriptionUnixTime,
+          //   endSubscription: endSubscriptionDate,
+          // },
+        },
+        {
+          new: true,
+        }
+      );
+
+      return updateUserPlan;
+    } catch (err) {
+      console.log(err);
     }
   }
 };
@@ -1029,11 +1059,16 @@ const getUserExp = async () => {
   const date = new Date();
   const timeZoneDate = convertTZ(date, "Africa/Blantyre");
   const subscriptionUnixTime = moment(timeZoneDate).unix();
+  // console.log(subscriptionUnixTime);
   const getExpSub = await User.find({
-    "subscription.subscriptionDate": { $lte: subscriptionUnixTime },
+    "subscription.endSubscription": { $lte: subscriptionUnixTime },
   });
 
-  // console.log(getExpSub);
+  if (getExpSub) {
+    getExpSub.map(async (user) => {
+      await userSubExp(user.id);
+    });
+  }
 };
 
 module.exports = {
@@ -1053,4 +1088,5 @@ module.exports = {
   processUserPayment,
   processPaypalPayment,
   getUserExp,
+  updateUserSocket,
 };

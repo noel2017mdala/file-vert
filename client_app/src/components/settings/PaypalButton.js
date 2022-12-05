@@ -10,7 +10,7 @@ import withReactContent from "sweetalert2-react-content";
 
 const PaypalButton = ({ billingData }) => {
   const paypal = useRef();
-  const { currentUser, socket } = useAuth();
+  const { currentUser, socket, userToken } = useAuth();
   const MySwal = withReactContent(Swal);
 
   const { data, isLoading, error, refetch } = useGQLQuery(
@@ -22,11 +22,16 @@ const PaypalButton = ({ billingData }) => {
     }
   );
 
-  const { mutateAsync: processPayment } = useGQLMutation(USER_PAYMENT_PAYPAL, {
-    onSuccess: () => {
-      // console.log("user is ready to be logged in");
+  const { mutateAsync: processPayment } = useGQLMutation(
+    USER_PAYMENT_PAYPAL,
+    {
+      onSuccess: () => {
+        // console.log("user is ready to be logged in");
+      },
     },
-  });
+    userToken,
+    currentUser.user.id
+  );
 
   useEffect(() => {
     getPlanDetails();

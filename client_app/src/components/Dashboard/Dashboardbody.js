@@ -14,22 +14,31 @@ import { UPDATE_USER_ACTIVE } from "../../Graphql/mutations";
 import Settings from "../Pages/Settings";
 
 const DashboardBody = ({ state, changeState }) => {
-  const { currentUser, socket } = useAuth();
+  const { currentUser, socket, userToken } = useAuth();
   const MySwal = withReactContent(Swal);
 
-  const { mutateAsync: updateUserState } = useGQLMutation(UPDATE_USER_ACTIVE, {
-    onSuccess: () => {
-      // console.log("user is ready to be logged in");
+  const { mutateAsync: updateUserState } = useGQLMutation(
+    UPDATE_USER_ACTIVE,
+    {
+      onSuccess: () => {
+        // console.log("user is ready to be logged in");
+      },
     },
-  });
+    userToken,
+    currentUser.user.id
+  );
 
-  const { data, isLoading, error } = useGQLQuery("get_user", GET_USER, {
-    id: currentUser.user.id,
-  });
+  const { data, isLoading, error } = useGQLQuery(
+    "get_user",
+    GET_USER,
+    {
+      id: currentUser.user.id,
+    },
+    {},
+    userToken,
+    currentUser.user.id
+  );
 
-  // if (!isLoading) {
-  //   console.log(data.getUser.userActive);
-  // }
 
   const demoFile = () => {
     MySwal.fire({
@@ -53,10 +62,20 @@ const DashboardBody = ({ state, changeState }) => {
   };
 
   useEffect(() => {
-    if (!isLoading && !data.getUser.userActive) {
+    if (
+      !isLoading &&
+      !data.getUser.userActive &&
+      data.getUser.response.status
+    ) {
       demoFile();
+    } else if (
+      !isLoading &&
+      !data.getUser.response.status &&
+      data.getUser.response.message === "unauthenticated_user"
+    ) {
+      console.log("user is about to log out");
     }
-  }, [isLoading]);
+  }, [isLoading, data]);
 
   return (
     <div className="min-h-screen bg-white w-screen">

@@ -16,6 +16,7 @@ const {
   getUserData,
   updateConverts,
   getUserExp,
+  updateUserSocket,
 } = require("./DB/Model/UserModel");
 
 const app = express();
@@ -24,9 +25,9 @@ const io = require("socket.io")(http);
 const port = process.env.PORT || 8000;
 let fileSize;
 
-// const job = schedule.scheduleJob("*/5 * * * * *", () => {
-//   getUserExp();
-// });
+const job = schedule.scheduleJob("0 0 * * *", () => {
+  getUserExp();
+});
 //0 0 * * *
 
 const storage = multer.diskStorage({
@@ -117,7 +118,6 @@ app.put("/upload/:id", upload.single("file"), async (req, res) => {
 
         let getConvertStatus = setInterval(async () => {
           let getUploadStatus = await getFileStatus(processId);
-          console.log(getUploadStatus);
 
           if (getUploadStatus && getUploadStatus.status) {
             if (getUploadStatus.status === "successful") {
@@ -132,10 +132,14 @@ app.put("/upload/:id", upload.single("file"), async (req, res) => {
                 await downloadFile(
                   getUploadStatus.target_files[0].id,
                   (result) => {
-                    io.sockets.emit("file-download", {
+                    io.sockets.to(user.userSocket).emit("file-download", {
                       message: "file ready for download",
                       result,
                     });
+                    // io.sockets.emit("file-download", {
+                    //   message: "file ready for download",
+                    //   result,
+                    // });
                     clearInterval(getConvertStatus);
                   }
                 );
@@ -143,6 +147,9 @@ app.put("/upload/:id", upload.single("file"), async (req, res) => {
             }
           } else {
             clearInterval(getConvertStatus);
+            io.sockets.to(user.userSocket).emit("file-download-error", {
+              message: "Unable to upload your file",
+            });
             console.log("failed");
           }
         }, 1000);
@@ -172,7 +179,7 @@ app.use("/graphql", (req, res) => {
     rootValue: rootResolver,
     context: {
       request: { req, res },
-      test: "Hello World",
+      // test: "Hello World",
     },
   })(req, res);
 });
@@ -195,6 +202,13 @@ io.on("connect", (socket) => {
   console.log(
     `user ${socket.request._query["userId"]} has this id ${socket.id}`
   );
+
+  if (socket.request._query["userId"] && socket.id) {
+    const updateSocket = updateUserSocket(
+      socket.request._query["userId"],
+      socket.id
+    );
+  }
 });
 
 // io.use(async (socket, next) =>)

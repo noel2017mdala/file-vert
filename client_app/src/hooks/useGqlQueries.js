@@ -1,15 +1,20 @@
 import { useQuery } from "react-query";
 import { request, GraphQLClient } from "graphql-request";
+import { useAuth } from "../context/AuthContext";
 
-export const useGQLQuery = (key, query, variables, configs = {}) => {
-  // const { userToken } = useAuth();
+export const useGQLQuery = (key, query, variables, configs = {}, token, id) => {
   let endPoint = process.env.REACT_APP_PRODUCTION_SERVER;
+
+  const userAuth = window.localStorage.getItem("user_items");
+  let userId = JSON.parse(userAuth).user.id;
+
   const headers = {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
       credentials: "include",
-      // Authorization: `Bearer ${userToken}`,
+      Authorization: `Bearer ${token}`,
+      "user-id": userId,
     },
   };
 

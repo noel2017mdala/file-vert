@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import fileUpload from "../../images/172620_upload_icon.png";
-import { GET_FORMATS, FETCH_DATA } from "../../Graphql/queries";
+import { GET_FORMATS, FETCH_DATA, GET_USER } from "../../Graphql/queries";
 import { useGQLQuery } from "../../hooks/useGqlQueries";
 import { useAuth } from "../../context/AuthContext";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -18,26 +18,40 @@ const GetStarted = () => {
   const [loaderState, setLoaderState] = useState(false);
   const [downloadButton, setDownloadButton] = useState(false);
   const [downloadContent, setDownloadContent] = useState();
-  const { currentUser, socket } = useAuth();
+  const { currentUser, socket, userToken, updateToken } = useAuth();
 
-  // const [getRootProps, getInputProps] = useDropzone({
-  //   accept: "image/*",
-  //   onDrop: (acceptedFiles) => {
-  //     setFiles(
-  //       acceptedFiles.map((file) =>
-  //         Object.assign(file, {
-  //           preview: URL.createObjectURL(file),
-  //         })
-  //       )
-  //     );
-  //   },
-  // });
+  const {
+    data: userData,
+    isLoading: userLoading,
+    error: userError,
+  } = useGQLQuery(
+    "get_user",
+    GET_USER,
+    {
+      id: currentUser.user.id,
+    },
+    {},
+    userToken,
+    currentUser.user.id
+  );
 
   useEffect(() => {
     socket.on("file-download", (data) => {
       setDownloadButton(true);
       setDownloadContent(data.result);
     });
+
+    socket.on("file-download-error", (data) => {
+      notify.fail(data.message);
+    });
+
+    if (!userLoading && userData.getUser) {
+      if (userData.getUser.response.token === null) {
+        // console.log("token active");
+      } else {
+        updateToken(userData.getUser.response.token);
+      }
+    }
   }, [socket]);
 
   const { data, isLoading, error, refetch } = useGQLQuery(
@@ -46,11 +60,18 @@ const GetStarted = () => {
     { id: currentUser.user.id, format: extensionName },
     {
       enabled: false,
-    }
+    },
+    userToken,
+    currentUser.user.id
   );
 
   const uploadFiles = (files) => {
-    if (files && convertName !== "Convert to" && convertName !== "") {
+    if (
+      files &&
+      convertName !== "Convert to" &&
+      convertName !== "" &&
+      !loaderState
+    ) {
       setLoaderState(true);
       const formData = new FormData();
       formData.append("description", "file conversion");
@@ -90,19 +111,21 @@ const GetStarted = () => {
   //   enabled: false,
   // });
 
-  const {
-    data: userData,
-    isLoading: loading,
-    error: userErr,
-    refetch: dataRefetch,
-  } = useGQLQuery(
-    "fetch_data",
-    FETCH_DATA,
-    { id: currentUser.user.id, format: "PPT" },
-    {
-      enabled: false,
-    }
-  );
+  // const {
+  //   data: userData,
+  //   isLoading: loading,
+  //   error: userErr,
+  //   refetch: dataRefetch,
+  // } = useGQLQuery(
+  //   "fetch_data",
+  //   FETCH_DATA,
+  //   { id: currentUser.user.id, format: "PPT" },
+  //   {
+  //     enabled: false,
+  //   },
+  //   userToken,
+  //   currentUser.user.id
+  // );
 
   const onDrop = useCallback(async (acceptedFiles) => {
     setLoaderState(true);
@@ -115,6 +138,10 @@ const GetStarted = () => {
       setTimeout(async () => {
         let fileExt = await refetch();
 
+        if (fileExt.data.getFormats.response.token) {
+          updateToken(fileExt.data.getFormats.response.token);
+          console.log("token updated");
+        }
         if (fileExt.data.getFormats) {
           if (fileExt.data.getFormats.response.status) {
             setConvertTypes(fileExt.data.getFormats.format);
@@ -253,7 +280,9 @@ const GetStarted = () => {
               </a>
             ) : (
               <button
-                className="p-3 px-6 pt-2 text-white bg-brightRed rounded-full font-bold hover:bg-brightRedLight"
+                className={`p-3 px-6 pt-2 text-white bg-brightRed rounded-full font-bold hover:bg-brightRedLight ${
+                  loaderState ? "cursor-not-allowed" : ""
+                }`}
                 onClick={() => {
                   // files.map((file) => {
                   //   let text = file.name;

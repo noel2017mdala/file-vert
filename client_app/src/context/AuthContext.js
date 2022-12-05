@@ -23,11 +23,15 @@ export const AuthProvider = ({ children }) => {
     },
   });
 
-  const { mutateAsync: tokenRefresh } = useGQLMutation(TOKEN_REFRESH, {
-    onSuccess: () => {
-      // console.log("user is ready to be logged in");
+  const { mutateAsync: tokenRefresh } = useGQLMutation(
+    TOKEN_REFRESH,
+    {
+      onSuccess: () => {
+        // console.log("user is ready to be logged in");
+      },
     },
-  });
+    userToken
+  );
 
   const navigate = useNavigate();
 
@@ -44,9 +48,11 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const userAuth = window.localStorage.getItem("user_items");
-    if (userAuth) {
+    if (userAuth && userToken) {
       let userId = JSON.parse(userAuth).user.id;
       setUserId(userId);
+      getUserToken();
+    } else if (userToken === null) {
       getUserToken();
     } else {
       setLoadingState(false);
@@ -87,6 +93,11 @@ export const AuthProvider = ({ children }) => {
   //   setLoadingState(false);
   // };
 
+  const updateToken = (token) => {
+    if (token) {
+      setUserToken(token);
+    }
+  };
   const userAuthLogin = async (email, password) => {
     let userLogIn = await userLogin({
       email: email,
@@ -114,6 +125,7 @@ export const AuthProvider = ({ children }) => {
     currentUser,
     userAuthLogin,
     socket,
+    updateToken,
   };
   return loadingState ? (
     <p>Loading</p>
