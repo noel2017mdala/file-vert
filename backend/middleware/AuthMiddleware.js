@@ -2,45 +2,59 @@ const jwt = require("jsonwebtoken");
 const { generateAccessToken } = require("../helper/generateAccessToken");
 
 const Auth = async (args) => {
-  // console.log(args.request.req["headers"]["user-id"]);
-  let refreshToken = args.request.req["headers"].cookie.split("=");
-  let accessToken = args.request.req["headers"].authorization.split(" ");
-  let userId = args.request.req["headers"]["user-id"];
+  if (
+    args.request.req["headers"].cookie !== undefined &&
+    args.request.req["headers"].authorization !== undefined
+  ) {
+    let refreshToken = args.request.req["headers"].cookie.split("=");
+    let accessToken = args.request.req["headers"].authorization.split(" ");
+    let userId = args.request.req["headers"]["user-id"];
 
-  if (refreshToken && accessToken) {
-    const accessTokenResponse = validateAccessToken(
-      accessToken[1],
-      userId,
-      (results) => {
-        return results;
+    if (refreshToken && accessToken) {
+      const accessTokenResponse = validateAccessToken(
+        accessToken[1],
+        userId,
+        (results) => {
+          return results;
+        }
+      );
+
+      const refreshTokenResponse = validateRefreshToken(
+        refreshToken[1],
+        userId,
+        (result) => {
+          return result;
+        }
+      );
+
+      if (refreshTokenResponse && accessTokenResponse) {
+        return {
+          accessTokenResponse,
+          token: null,
+          refreshTokenResponse,
+        };
+      } else if (refreshTokenResponse && !accessTokenResponse && userId) {
+        const accessToken = await generateAccessToken(userId);
+
+        return {
+          accessTokenResponse,
+          token: accessToken,
+          refreshTokenResponse,
+        };
+      } else if (!refreshTokenResponse && !accessTokenResponse) {
+        console.log("user should log out");
       }
-    );
-
-    const refreshTokenResponse = validateRefreshToken(
-      refreshToken[1],
-      userId,
-      (result) => {
-        return result;
-      }
-    );
-
-    if (refreshTokenResponse && accessTokenResponse) {
-      return {
-        accessTokenResponse,
-        token: null,
-        refreshTokenResponse,
-      };
-    } else if (refreshTokenResponse && !accessTokenResponse && userId) {
-      const accessToken = await generateAccessToken(userId);
-
-      return {
-        accessTokenResponse,
-        token: accessToken,
-        refreshTokenResponse,
-      };
-    } else if (!refreshTokenResponse && !accessTokenResponse) {
-      console.log("user should log out");
     }
+  } else {
+    return {
+      accessTokenResponse: {
+        status: false,
+      },
+      token: null,
+      refreshTokenResponse: {
+        status: false,
+      },
+    };
   }
 };
 

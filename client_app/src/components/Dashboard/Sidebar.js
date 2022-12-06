@@ -5,7 +5,7 @@ import files_dashboard from "../../images/files_dashboard.svg";
 import { MdArrowBack, MdArrowForward } from "react-icons/md";
 
 const Sidebar = ({ state, changeState }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, logUserOut } = useAuth();
   const [openSideBar, setOpenSideBar] = useState(false);
   return (
     <div className="min-h-screen">
@@ -21,9 +21,9 @@ const Sidebar = ({ state, changeState }) => {
           }}
         >
           {openSideBar ? (
-            <MdArrowBack color="F6866A" size={25}/>
+            <MdArrowBack color="F6866A" size={25} />
           ) : (
-            <MdArrowForward color="F6866A" size={25}/>
+            <MdArrowForward color="F6866A" size={25} />
           )}
         </div>
         <div className="flex items-center justify-center  border-b  md:my-0 ">
@@ -316,7 +316,11 @@ const Sidebar = ({ state, changeState }) => {
               </p>
             </li>
 
-            <li>
+            <li
+              onClick={() => {
+                logUserOut(currentUser.user.id);
+              }}
+            >
               <p className="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-brightRed cursor-pointer">
                 <span className="inline-flex justify-center items-center ml-4">
                   <svg

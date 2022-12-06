@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import messages from "../../images/message_alert_icon.svg";
 
 const Messages = () => {
-  const { currentUser, socket, userToken, updateToken } = useAuth();
+  const { currentUser, socket, userToken, updateToken, userLogout } = useAuth();
   const {
     data: userData,
     isLoading: userLoading,
@@ -27,6 +27,11 @@ const Messages = () => {
         // console.log("token active");
       } else {
         updateToken(userData.getUser.response.token);
+      }
+
+      if (userData.getUser.response.message === "unauthenticated_user") {
+        console.log("messages");
+        userLogout();
       }
     }
   });

@@ -1071,6 +1071,24 @@ const getUserExp = async () => {
   }
 };
 
+const userLogout = async (id) => {
+  if (id) {
+    const logout = await User.findByIdAndUpdate(id, {
+      userRefreshToken: {
+        refreshToken: null,
+        lastRefresh: getTime(),
+      },
+    });
+
+    if (logout) {
+      return {
+        status: true,
+        message: "user cleared",
+      };
+    }
+  }
+};
+
 module.exports = {
   createUser,
   login,
@@ -1089,4 +1107,5 @@ module.exports = {
   processPaypalPayment,
   getUserExp,
   updateUserSocket,
+  userLogout,
 };

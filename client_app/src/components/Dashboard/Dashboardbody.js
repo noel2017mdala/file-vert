@@ -39,7 +39,6 @@ const DashboardBody = ({ state, changeState }) => {
     currentUser.user.id
   );
 
-
   const demoFile = () => {
     MySwal.fire({
       icon: "info",
@@ -68,12 +67,6 @@ const DashboardBody = ({ state, changeState }) => {
       data.getUser.response.status
     ) {
       demoFile();
-    } else if (
-      !isLoading &&
-      !data.getUser.response.status &&
-      data.getUser.response.message === "unauthenticated_user"
-    ) {
-      console.log("user is about to log out");
     }
   }, [isLoading, data]);
 

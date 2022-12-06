@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Notification from "../Dashboard/Notification";
 import Billing from "../settings/Billing";
 import Notifications from "../settings/Notifications";
 import Password from "../settings/Password";
 import Profile from "../settings/Profile";
+import { useAuth } from "../../context/AuthContext";
+import { GET_USER } from "../../Graphql/queries";
+import { useGQLQuery } from "../../hooks/useGqlQueries";
 const Settings = ({ userData }) => {
   const [uiState, setUiState] = useState({
     profileState: true,
@@ -11,6 +14,39 @@ const Settings = ({ userData }) => {
     billingState: false,
     notificationState: false,
   });
+
+  const { currentUser, socket, userToken, updateToken, userLogout } = useAuth();
+
+  const {
+    data: user_Data,
+    isLoading: userLoading,
+    error: userError,
+  } = useGQLQuery(
+    "get_user",
+    GET_USER,
+    {
+      id: currentUser.user.id,
+    },
+    {},
+    userToken,
+    currentUser.user.id
+  );
+
+  useEffect(() => {
+    if (!userLoading && user_Data.getUser) {
+      if (user_Data.getUser.response.token === null) {
+        // console.log("token active");
+      } else {
+        updateToken(user_Data.getUser.response.token);
+      }
+
+      if (user_Data.getUser.response.message === "unauthenticated_user") {
+        console.log("Settings");
+        userLogout();
+      }
+    }
+  }, [socket]);
+
   return (
     <div className="">
       <div className="h-screen">
@@ -94,7 +130,7 @@ const Settings = ({ userData }) => {
           ) : uiState.passwordState ? (
             <Password />
           ) : uiState.billingState ? (
-            <Billing userData={userData}/>
+            <Billing userData={userData} />
           ) : uiState.notificationState ? (
             <Notifications />
           ) : null}

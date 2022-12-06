@@ -6,7 +6,8 @@ export const useGQLMutation = (query, configs = {}, token, id) => {
   let endPoint = process.env.REACT_APP_PRODUCTION_SERVER;
 
   const userAuth = window.localStorage.getItem("user_items");
-  let userId = JSON.parse(userAuth).user.id;
+
+  let userId = userAuth ? JSON.parse(userAuth).user.id : null;
 
   const headers = {
     headers: {

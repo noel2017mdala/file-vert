@@ -8,6 +8,8 @@ import { useGQLMutation } from "../../hooks/useGqlMutations";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { ToastContainer } from "react-toastify";
+import ClipLoader from "react-spinners/ClipLoader";
+import { css } from "@emotion/react";
 
 import { notify } from "../../helper/notification";
 
@@ -17,6 +19,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [loader, setLoader] = useState(false);
 
   const [errorState, setErrorState] = useState({
     emailError: false,
@@ -31,6 +34,11 @@ const SignUp = ({ loginTabState, loginTab }) => {
       // console.log("user is ready to be logged in");
     },
   });
+
+  const override = css`
+    display: block;
+    border-color: #00bfa5;
+  `;
 
   return (
     <div className="w-4/5 mx-auto">
@@ -341,7 +349,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
             className="w-full px-6 py-3 rounded-xl bg-brightRed  transition hover:bg-brightRedLight focus:bg-brightRedLight active:bg-brightRed"
             onClick={async (e) => {
               e.preventDefault();
-
+              setLoader(true);
               if (
                 firstName === "" &&
                 lastName === "" &&
@@ -356,6 +364,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: true,
                   phoneNumberErr: true,
                 });
+                setLoader(false);
               } else if (firstName === "") {
                 setErrorState({
                   emailError: false,
@@ -364,6 +373,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: false,
                   phoneNumberErr: false,
                 });
+                setLoader(false);
               } else if (lastName === "") {
                 setErrorState({
                   emailError: false,
@@ -372,6 +382,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: true,
                   phoneNumberErr: false,
                 });
+                setLoader(false);
               } else if (email === "") {
                 setErrorState({
                   emailError: true,
@@ -380,6 +391,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: false,
                   phoneNumberErr: false,
                 });
+                setLoader(false);
               } else if (!validateEmail(email)) {
                 setErrorState({
                   emailError: true,
@@ -388,6 +400,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: false,
                   phoneNumberErr: false,
                 });
+                setLoader(false);
               } else if (!phoneNumber) {
                 setErrorState({
                   emailError: false,
@@ -396,6 +409,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: false,
                   phoneNumberErr: true,
                 });
+                setLoader(false);
               } else if (phoneNumber === "") {
                 setErrorState({
                   emailError: false,
@@ -404,6 +418,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: false,
                   phoneNumberErr: true,
                 });
+                setLoader(false);
               } else if (phoneNumber.length < 9) {
                 setErrorState({
                   emailError: false,
@@ -412,6 +427,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: false,
                   phoneNumberErr: true,
                 });
+                setLoader(false);
               } else if (password === "") {
                 setErrorState({
                   emailError: false,
@@ -420,6 +436,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: false,
                   phoneNumberErr: false,
                 });
+                setLoader(false);
               } else if (password.length < 6) {
                 setErrorState({
                   emailError: false,
@@ -428,6 +445,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                   lastNameErr: false,
                   phoneNumberErr: false,
                 });
+                setLoader(false);
               } else {
                 let getTimeZone =
                   Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -453,14 +471,27 @@ const SignUp = ({ loginTabState, loginTab }) => {
                         createAccount: false,
                       });
                     }, 3000);
+                    setLoader(false);
                   } else {
                     notify.fail(createUserData.createUser.message);
+                    setLoader(false);
                   }
                 }
               }
             }}
           >
-            <span className="font-semibold text-white text-lg">Sign Up</span>
+            <span className="font-semibold text-white text-lg">
+              {loader ? (
+                <ClipLoader
+                  color="#FFFFFF"
+                  css={override}
+                  size={15}
+                  className=""
+                />
+              ) : (
+                "Sign Up"
+              )}
+            </span>
           </button>
         </div>
       </form>

@@ -3,8 +3,10 @@ import { io } from "socket.io-client";
 import { Link, useNavigate } from "react-router-dom";
 import { useGQLQuery } from "../hooks/useGqlQueries";
 import { useGQLMutation } from "../hooks/useGqlMutations";
-import { LOGIN, TOKEN_REFRESH } from "../Graphql/mutations";
+import { LOGIN, TOKEN_REFRESH, USER_LOGOUT } from "../Graphql/mutations";
 import { GET_USER } from "../Graphql/queries";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const AuthContext = React.createContext();
 
@@ -13,6 +15,7 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const MySwal = withReactContent(Swal);
   const [currentUser, setCurrentUser] = useState();
   const [userToken, setUserToken] = useState(null);
   const [userId, setUserId] = useState();
@@ -44,6 +47,17 @@ export const AuthProvider = ({ children }) => {
     {
       enabled: false,
     }
+  );
+
+  const { mutateAsync: updateUser } = useGQLMutation(
+    USER_LOGOUT,
+    {
+      onSuccess: () => {
+        // console.log("user is ready to be logged in");
+      },
+    },
+    userToken,
+    userId
   );
 
   useEffect(() => {
@@ -109,7 +123,6 @@ export const AuthProvider = ({ children }) => {
         loggedIn: true,
         user: userLogIn.userLogin.user,
       };
-      console.log(userData);
 
       window.localStorage.setItem("user_items", JSON.stringify(userData));
       setCurrentUser(userData);
@@ -120,12 +133,45 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
   };
+
+  const userLogout = () => {
+    // console.log("user logout");
+    const userAuth = window.localStorage.getItem("user_items");
+    if (userAuth) {
+      MySwal.fire({
+        icon: "info",
+        title: `Your session has expired`,
+        text: "and you will be logged out",
+        confirmButtonColor: "#F25F3A",
+        preConfirm: async () => {
+          await logUserOut(userId);
+          window.localStorage.clear("user_items");
+        },
+        allowOutsideClick: async () => {
+          await logUserOut(userId);
+          window.localStorage.clear("user_items");
+        },
+      });
+    }
+  };
+
+  const logUserOut = async (id) => {
+    let logoutResponse = await updateUser({
+      userId: id,
+    });
+
+    if (logoutResponse.userLogOut.status) {
+      navigate("/get-started");
+    }
+  };
   const value = {
     userToken,
     currentUser,
     userAuthLogin,
     socket,
     updateToken,
+    userLogout,
+    logUserOut,
   };
   return loadingState ? (
     <p>Loading</p>

@@ -10,7 +10,7 @@ const {
   updatePassword,
   processUserPayment,
   processPaypalPayment,
-  getUserExp,
+  userLogout,
 } = require("../DB/Model/UserModel");
 const {
   createPlan,
@@ -144,7 +144,12 @@ const rootResolver = {
       userFormats.response.token = authResponse.token;
       return userFormats;
     } else {
-      console.log("wawa token has expired get formats");
+      return {
+        response: {
+          status: false,
+          message: "unauthenticated_user",
+        },
+      };
     }
   },
 
@@ -169,7 +174,12 @@ const rootResolver = {
     ) {
       return updateUserActiveState(id);
     } else {
-      console.log("wawa token has expired user state");
+      return {
+        response: {
+          status: false,
+          message: "unauthenticated_user",
+        },
+      };
     }
   },
 
@@ -189,7 +199,6 @@ const rootResolver = {
       authResponse.refreshTokenResponse.status
     ) {
       let userProfile = await updateProfile({ id, firstName, lastName, email });
-      console.log(userProfile);
       userProfile.token = authResponse.token;
 
       return userProfile;
@@ -203,7 +212,12 @@ const rootResolver = {
 
       return userProfile;
     } else {
-      console.log("wawa token has expired profile update");
+      return {
+        response: {
+          status: false,
+          message: "unauthenticated_user",
+        },
+      };
     }
   },
 
@@ -245,6 +259,12 @@ const rootResolver = {
       return userPasswordUpdate;
     } else {
       console.log("wawa token has expired update password");
+      return {
+        response: {
+          status: false,
+          message: "unauthenticated_user",
+        },
+      };
     }
   },
 
@@ -278,11 +298,16 @@ const rootResolver = {
       return userPayment;
     } else {
       console.log("wawa token has expired process payment");
+      return {
+        response: {
+          status: false,
+          message: "unauthenticated_user",
+        },
+      };
     }
   },
 
   getUserPlan: async ({ id }, args, context) => {
-    console.log("plans");
     return getUserPlan(id);
   },
 
@@ -306,11 +331,21 @@ const rootResolver = {
       return payPalPayment;
     } else {
       console.log("wawa token has expired paypal");
+      return {
+        response: {
+          status: false,
+          message: "unauthenticated_user",
+        },
+      };
     }
   },
 
-  getExpUserPlan: async () => {
-    getUserExp();
+  // getExpUserPlan: async () => {
+  //   getUserExp();
+  // },
+
+  userLogOut: async ({ userId }, args, context) => {
+    return userLogout(userId);
   },
 };
 

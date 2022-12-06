@@ -7,7 +7,6 @@ const connection = require("./DB/connection");
 const schema = require("./graphql/Schema");
 const rootResolver = require("./graphql/Resolver");
 const cookieParser = require("cookie-parser");
-const demoMiddleWare = require("./middleware/demoMiddleWare");
 const schedule = require("node-schedule");
 const {
   uploadFileConvert,
@@ -28,7 +27,6 @@ let fileSize;
 const job = schedule.scheduleJob("0 0 * * *", () => {
   getUserExp();
 });
-//0 0 * * *
 
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {

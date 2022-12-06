@@ -18,7 +18,7 @@ const GetStarted = () => {
   const [loaderState, setLoaderState] = useState(false);
   const [downloadButton, setDownloadButton] = useState(false);
   const [downloadContent, setDownloadContent] = useState();
-  const { currentUser, socket, userToken, updateToken } = useAuth();
+  const { currentUser, socket, userToken, updateToken, userLogout } = useAuth();
 
   const {
     data: userData,
@@ -50,6 +50,11 @@ const GetStarted = () => {
         // console.log("token active");
       } else {
         updateToken(userData.getUser.response.token);
+      }
+
+      if (userData.getUser.response.message === "unauthenticated_user") {
+        console.log(userData.getUser.response.message);
+        userLogout();
       }
     }
   }, [socket]);

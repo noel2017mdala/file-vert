@@ -11,6 +11,8 @@ import { useGQLQuery } from "../../hooks/useGqlQueries";
 import { ToastContainer } from "react-toastify";
 import { notify } from "../../helper/notification";
 import { useAuth } from "../../context/AuthContext";
+import ClipLoader from "react-spinners/ClipLoader";
+import { css } from "@emotion/react";
 
 const Login = () => {
   const [tabState, changeStabState] = useState({
@@ -61,6 +63,7 @@ const Login = () => {
 const UserLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loader, setLoader] = useState(false);
 
   const [errorState, setErrorState] = useState({
     emailError: false,
@@ -81,6 +84,11 @@ const UserLogin = () => {
       enabled: false,
     }
   );
+
+  const override = css`
+    display: block;
+    border-color: #00bfa5;
+  `;
 
   return (
     <div className="">
@@ -243,7 +251,7 @@ const UserLogin = () => {
             className="w-full px-6 py-3 rounded-xl bg-brightRed  transition hover:bg-brightRedLight focus:bg-brightRedLight active:bg-brightRed"
             onClick={async (e) => {
               e.preventDefault();
-              // console.log({ email, password });
+              setLoader(true);
 
               if (email === "" && password === "") {
                 setErrorState({
@@ -252,27 +260,32 @@ const UserLogin = () => {
                   emailErrMsg: "Please enter your email",
                   passwordErrMsg: "Please enter your password",
                 });
+                setLoader(false);
               } else if (email === "") {
                 setErrorState({
                   emailError: true,
                   emailErrMsg: "Please enter your email",
                 });
+                setLoader(false);
               } else if (!emailValidator(email)) {
                 setErrorState({
                   emailError: true,
                   emailErrMsg: "Please enter a valid email address",
                 });
+                setLoader(false);
               } else if (password === "") {
                 setErrorState({
                   passwordErr: true,
                   passwordErrMsg: "Please enter your password",
                 });
+                setLoader(false);
               } else if (password.length < 6) {
                 setErrorState({
                   passwordErr: true,
                   passwordErrMsg:
                     "Password should not be less than 6 characters",
                 });
+                setLoader(false);
               } else {
                 try {
                   const getUserAuth = await userAuthLogin(email, password);
@@ -285,16 +298,29 @@ const UserLogin = () => {
                     setEmail("");
                     setPassword("");
                     notify.fail("Invalid email or password.");
+                    setLoader(false);
                   }
                 } catch (error) {
                   setEmail("");
                   setPassword("");
                   notify.fail("Failed to login.");
+                  setLoader(false);
                 }
               }
             }}
           >
-            <span className="font-semibold text-white text-lg">Login</span>
+            <span className="font-semibold text-white text-lg">
+              {loader ? (
+                <ClipLoader
+                  color="#FFFFFF"
+                  css={override}
+                  size={15}
+                  className=""
+                />
+              ) : (
+                "Login"
+              )}
+            </span>
           </button>
         </div>
       </form>

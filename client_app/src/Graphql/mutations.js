@@ -108,3 +108,12 @@ export const USER_PAYMENT_PAYPAL = gql`
     }
   }
 `;
+
+export const USER_LOGOUT = gql`
+  mutation ($userId: ID) {
+    userLogOut(userId: $userId) {
+      status
+      message
+    }
+  }
+`;

@@ -67,6 +67,7 @@ type Mutation{
     updateUserPassword(id: ID, oldPassword: String, password: String, confirmPassword: String): Response,
     processPayment(id: ID, amount: String, productID: ID, token: String): Response
     paypalPayment(userId: ID, planId: ID):  Response
+    userLogOut(userId: ID): Response
 }
 
 
