@@ -18,7 +18,10 @@ export const useGQLMutation = (query, configs = {}, token, id) => {
     },
   };
 
-  const graphQlClient = new GraphQLClient(endPoint, headers);
+  const graphQlClient = new GraphQLClient(endPoint, {
+    credentials: "include",
+    headers: headers,
+  });
 
   const makeMutation = async (variables) =>
     await graphQlClient.request(query, variables);
