@@ -15,22 +15,6 @@ const Billing = ({ userData }) => {
     GET_USER_PLANS
   );
 
-  const {
-    data: userPlanData,
-    isLoading: loader,
-    error: userErr,
-    refetch,
-  } = useGQLQuery(
-    "get_exp_user_plan",
-    GET_EXP_USER_PLAN,
-    {
-      id: currentUser.user.id,
-    },
-    {},
-    userToken,
-    currentUser.user.id
-  );
-
   const [selectedCard, setSelectedCard] = useState();
   const [billingInfo, setBillingInfo] = useState({
     billing: true,

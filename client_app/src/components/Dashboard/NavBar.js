@@ -6,7 +6,7 @@ const Navbar = () => {
   const [openDropDown, setopenDropDown] = useState(false);
   const [openNotifications, seOpenNotifications] = useState(false);
   const [shakeAnimation, setShakeAnimation] = useState(false);
-  const { currentUser, socket } = useAuth();
+  const { currentUser, socket, logUserOut } = useAuth();
 
   useEffect(() => {
     socket.on("file-download", (data) => {
@@ -108,37 +108,30 @@ const Navbar = () => {
                 aria-labelledby="dropdownInformdropdownAvatarNameButtonationButton"
               >
                 <li>
-                  <a
-                    href="#"
-                    className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
+                  <p className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                     Dashboard
-                  </a>
+                  </p>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
+                  <p className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                     Messages
-                  </a>
+                  </p>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                  >
+                  <p className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
                     Settings
-                  </a>
+                  </p>
                 </li>
               </ul>
-              <div className="py-1">
-                <a
-                  href="#"
-                  className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                >
+              <div
+                className="py-1 cursor-pointer"
+                onClick={() => {
+                  logUserOut(currentUser.user.id);
+                }}
+              >
+                <p className="block py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">
                   Sign out
-                </a>
+                </p>
               </div>
             </div>
           </div>
