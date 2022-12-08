@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  let socket = io(`http://localhost:8000`, {
+  let socket = io(`https://file-vert-backend-production.up.railway.app`, {
     transports: ["websocket"],
     query: `userId=${!userId ? null : userId}`,
   });
