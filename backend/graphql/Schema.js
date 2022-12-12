@@ -23,7 +23,7 @@ type LoginResponse {
     user: User,
     token: String,
     response: Response,
-    # refreshToken: String.
+    refreshToken: String,
     id: ID
 }
 

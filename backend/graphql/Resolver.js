@@ -36,40 +36,40 @@ const rootResolver = {
       const userData = await login({ email, password });
 
       if (userData.token && userData.refreshToken) {
-        if (process.env.NODE_ENV === "production") {
-          // args.request.res.cookie("token", userData.token, {
-          //   httpOnly: true,
-          //   secure: process.env.NODE_ENV === "production",
-          //   path: "/graphql",
-          //   sameSite: "none",
-          //   expires: new Date(new Date().getTime() + 15 * 60 * 1000),
-          // });
+        // if (process.env.NODE_ENV === "production") {
+        //   // args.request.res.cookie("token", userData.token, {
+        //   //   httpOnly: true,
+        //   //   secure: process.env.NODE_ENV === "production",
+        //   //   path: "/graphql",
+        //   //   sameSite: "none",
+        //   //   expires: new Date(new Date().getTime() + 15 * 60 * 1000),
+        //   // });
 
-          args.request.res.cookie("r_token", userData.refreshToken, {
-            httpOnly: true,
-            secure: true,
-            path: "/",
-            sameSite: "none",
-            expires: AddDays(30),
-          });
-        } else {
-          // args.request.res.cookie("token", userData.token, {
-          //   httpOnly: true,
-          //   secure: true,
-          //   path: "/",
-          //   sameSite: "none",
-          //   expires: new Date(new Date().getTime() + 15 * 60 * 1000),
-          // });
+        //   args.request.res.cookie("r_token", userData.refreshToken, {
+        //     httpOnly: true,
+        //     secure: true,
+        //     path: "/",
+        //     sameSite: "none",
+        //     expires: AddDays(30),
+        //   });
+        // } else {
+        //   // args.request.res.cookie("token", userData.token, {
+        //   //   httpOnly: true,
+        //   //   secure: true,
+        //   //   path: "/",
+        //   //   sameSite: "none",
+        //   //   expires: new Date(new Date().getTime() + 15 * 60 * 1000),
+        //   // });
 
-          // console.log(userData.user.userRefreshToken.refreshToken);
-          args.request.res.cookie("r_token", userData.refreshToken, {
-            httpOnly: true,
-            secure: true,
-            path: "/",
-            sameSite: "none",
-            expires: AddDays(30),
-          });
-        }
+        //   // console.log(userData.user.userRefreshToken.refreshToken);
+        //   args.request.res.cookie("r_token", userData.refreshToken, {
+        //     httpOnly: true,
+        //     secure: true,
+        //     path: "/",
+        //     sameSite: "none",
+        //     expires: AddDays(30),
+        //   });
+        // }
 
         return userData;
       }

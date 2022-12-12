@@ -7,6 +7,8 @@ import { LOGIN, TOKEN_REFRESH, USER_LOGOUT } from "../Graphql/mutations";
 import { GET_USER } from "../Graphql/queries";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { createCookie } from "../helper/createRefreshToken";
+import Cookie from "universal-cookie";
 
 const AuthContext = React.createContext();
 
@@ -37,6 +39,7 @@ export const AuthProvider = ({ children }) => {
   );
 
   const navigate = useNavigate();
+  let cookies = new Cookie();
 
   const { data, isLoading, error, refetch } = useGQLQuery(
     "get_current_user",
@@ -118,7 +121,11 @@ export const AuthProvider = ({ children }) => {
       password: password,
     });
 
-    if (userLogIn.userLogin && userLogIn.userLogin.response.status) {
+    if (
+      userLogIn.userLogin &&
+      userLogIn.userLogin.response.status &&
+      createCookie("r_token", userLogIn.userLogin.refreshToken)
+    ) {
       let userData = {
         loggedIn: true,
         user: userLogIn.userLogin.user,
@@ -146,10 +153,12 @@ export const AuthProvider = ({ children }) => {
         preConfirm: async () => {
           await logUserOut(userId);
           window.localStorage.clear("user_items");
+          cookies.remove("r_token");
         },
         allowOutsideClick: async () => {
           await logUserOut(userId);
           window.localStorage.clear("user_items");
+          cookies.remove("r_token");
         },
       });
     }

@@ -18,10 +18,12 @@ export const useGQLQuery = (key, query, variables, configs = {}, token, id) => {
     },
   };
 
-  const graphQlClient = new GraphQLClient(endPoint, {
-    credentials: "include",
-    headers: headers,
-  });
+  const graphQlClient = new GraphQLClient(endPoint, headers);
+
+  // const graphQlClient = new GraphQLClient(endPoint, {
+  //   credentials: "include",
+  //   headers: headers,
+  // });
 
   const fetchData = async () => await graphQlClient.request(query, variables);
   //   const fetchData = async () => await request(endPoint, query, variables);

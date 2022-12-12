@@ -9,7 +9,7 @@ export const LOGIN = gql`
         id
       }
       token
-      #refreshToken
+      refreshToken
       response {
         status
         message

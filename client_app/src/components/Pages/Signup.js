@@ -260,7 +260,7 @@ const SignUp = ({ loginTabState, loginTab }) => {
                 : null
             }
             `}
-            placeholder="997216715"
+            placeholder="991234123"
             required
             autoComplete="off"
             onChange={(text) => {
