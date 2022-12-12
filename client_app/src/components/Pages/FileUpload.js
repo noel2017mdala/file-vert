@@ -84,7 +84,7 @@ const GetStarted = () => {
       formData.append("file", files);
 
       axios
-        .put(` http://localhost:8000/upload/${currentUser.user.id}`, formData)
+        .put(` ${process.env.REACT_APP_PRODUCTION_SERVER}/upload/${currentUser.user.id}`, formData)
         .then((res) => {
           // console.log(res.data);
           if (res.data.status) {

@@ -1,6 +1,8 @@
 import { useQuery } from "react-query";
 import { request, GraphQLClient } from "graphql-request";
 import { useAuth } from "../context/AuthContext";
+import Cookie from "universal-cookie";
+let cookies = new Cookie();
 
 export const useGQLQuery = (key, query, variables, configs = {}, token, id) => {
   let endPoint = process.env.REACT_APP_PRODUCTION_SERVER;
@@ -15,6 +17,7 @@ export const useGQLQuery = (key, query, variables, configs = {}, token, id) => {
       credentials: "include",
       Authorization: `Bearer ${token}`,
       "user-id": userId,
+      "r_token_data": cookies.get("r_token"),
     },
   };
 

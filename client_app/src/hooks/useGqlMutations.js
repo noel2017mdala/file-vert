@@ -11,15 +11,13 @@ export const useGQLMutation = (query, configs = {}, token, id) => {
 
   let userId = userAuth ? JSON.parse(userAuth).user.id : null;
 
-  console.log(cookies.get("r_user_token"));
-
   const headers = {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
       "user-id": userId,
-      // "r-token": cookies.get("r_user_token"),
+      r_token_data: cookies.get("r_token"),
     },
   };
 
