@@ -84,15 +84,23 @@ const GetStarted = () => {
       formData.append("file", files);
 
       axios
-        .put(` ${process.env.REACT_APP_PRODUCTION_SERVER}/upload/${currentUser.user.id}`, formData)
+        .put(
+          ` ${process.env.REACT_APP_PRODUCTION_SERVER_URL}/upload/${currentUser.user.id}`,
+          formData
+        )
         .then((res) => {
-          // console.log(res.data);
-          if (res.data.status) {
+          if (
+            res.data.status &&
+            res.data.response.status &&
+            res.data.response.downloadLink !== ""
+          ) {
             notify.successBottom(
-              "Your file is being converted you will be notified once done "
+              "Your file is  ready for download"
             );
             setLoaderState(false);
             setFiles(undefined);
+            setDownloadButton(true);
+            setDownloadContent(res.data.response);
           } else {
             notify.fail(res.data.response.message);
             setLoaderState(false);
@@ -100,6 +108,7 @@ const GetStarted = () => {
           }
         })
         .catch((err) => {
+          console.log(err);
           notify.fail("failed to convert your file please try again later");
           setLoaderState(false);
           setFiles(undefined);
