@@ -1055,6 +1055,71 @@ const processPaypalPayment = async (userId, planId) => {
   }
 };
 
+const userFreeSubscription = async (userId, planId) => {
+  if (userId !== "" && planId !== "") {
+    const getUserPlan = await Plans.findOne({ _id: planId });
+    const getUser = await getUserData(userId);
+
+    const date = new Date();
+    const timeZoneDate = convertTZ(date, getUser.userTimezone);
+
+    const subscriptionUnixTime = moment(timeZoneDate).unix();
+
+    var today = new Date();
+    var nextSubscriptionDate = new Date(
+      new Date().setDate(today.getDate() + 30)
+    );
+    const newDate = convertTZ(nextSubscriptionDate, getUser.userTimezone);
+    const endSubscriptionDate = moment(newDate).unix();
+
+    if (getUserPlan && getUser) {
+      try {
+        const updateUserPlan = await User.findByIdAndUpdate(
+          userId,
+          {
+            plan: planId,
+            numberOfConverts: 0,
+            subscription: {
+              subscriptionDate: subscriptionUnixTime,
+              endSubscription: endSubscriptionDate,
+            },
+          },
+          {
+            new: true,
+          }
+        );
+
+        if (updateUserPlan) {
+          return {
+            status: true,
+            message: "Subscription changes successfully",
+          };
+        } else {
+          return {
+            status: false,
+            message: "failed to change subscription please try again later",
+          };
+        }
+      } catch (error) {
+        return {
+          status: false,
+          message: "failed to change subscription please try again later",
+        };
+      }
+    } else {
+      return {
+        status: false,
+        message: "failed to change subscription please try again later",
+      };
+    }
+  } else {
+    return {
+      status: false,
+      message: "failed to change subscription please try again later",
+    };
+  }
+};
+
 const getUserExp = async () => {
   const date = new Date();
   const timeZoneDate = convertTZ(date, "Africa/Blantyre");
@@ -1108,4 +1173,5 @@ module.exports = {
   getUserExp,
   updateUserSocket,
   userLogout,
+  userFreeSubscription,
 };

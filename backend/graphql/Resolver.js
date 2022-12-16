@@ -11,6 +11,7 @@ const {
   processUserPayment,
   processPaypalPayment,
   userLogout,
+  userFreeSubscription,
 } = require("../DB/Model/UserModel");
 const {
   createPlan,
@@ -331,6 +332,34 @@ const rootResolver = {
       return payPalPayment;
     } else {
       console.log("wawa token has expired paypal");
+      return {
+        response: {
+          status: false,
+          message: "unauthenticated_user",
+        },
+      };
+    }
+  },
+
+  freeSubscription: async ({ userId, planId }, args, context) => {
+    const authResponse = await Auth(args);
+
+    if (
+      authResponse.accessTokenResponse.status &&
+      authResponse.refreshTokenResponse.status
+    ) {
+      let processPayment = await userFreeSubscription(userId, planId);
+      processPayment.token = authResponse.token;
+      return processPayment;
+    } else if (
+      authResponse.refreshTokenResponse.status &&
+      authResponse.accessTokenResponse.status === undefined &&
+      authResponse.accessTokenResponse.token !== null
+    ) {
+      let processPayment = await userFreeSubscription(userId, planId);
+      processPayment.token = authResponse.token;
+      return processPayment;
+    } else {
       return {
         response: {
           status: false,

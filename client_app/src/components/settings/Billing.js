@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { GET_USER_PLANS, GET_EXP_USER_PLAN } from "../../Graphql/queries";
+import { GET_USER_PLANS } from "../../Graphql/queries";
+import { USER_FREE_SUBSCRIPTION } from "../../Graphql/mutations";
 import { convertTZ } from "../../helper/TimeConverter";
 import { useGQLQuery } from "../../hooks/useGqlQueries";
+import { useGQLMutation } from "../../hooks/useGqlMutations";
 import BillingInfo from "./BillingInfo";
 import * as moment from "moment";
 import { ToastContainer } from "react-toastify";
 import { notify } from "../../helper/notification";
 import { useAuth } from "../../context/AuthContext";
+import Swal from "sweetalert2";
 const Billing = ({ userData }) => {
   const { currentUser, socket, userToken } = useAuth();
 
@@ -20,6 +23,17 @@ const Billing = ({ userData }) => {
     billing: true,
     billingInfo: false,
   });
+
+  const { mutateAsync: updateUserSubscription } = useGQLMutation(
+    USER_FREE_SUBSCRIPTION,
+    {
+      onSuccess: () => {
+        // console.log("user is ready to be logged in");
+      },
+    },
+    userToken,
+    currentUser.user.id
+  );
   return (
     <>
       {billingInfo.billing ? (
@@ -43,6 +57,43 @@ const Billing = ({ userData }) => {
                       if (selectedCard) {
                         if (selectedCard.name === "free") {
                           console.log("free subscription to be active active");
+
+                          Swal.fire({
+                            title:
+                              "Are you sure you want to activate free subscription?",
+                            text: "You won't be able to revert this!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#F25F3A",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Yes",
+                          }).then(async (result) => {
+                            if (result.isConfirmed) {
+                              const updateSubscription =
+                                await updateUserSubscription({
+                                  userId: currentUser.user.id,
+                                  planId: selectedCard.id,
+                                });
+
+                              console.log(updateSubscription);
+
+                              if (updateSubscription.freeSubscription.status) {
+                                Swal.fire({
+                                  icon: "success",
+                                  title: `Subscription change`,
+                                  text: "Subscription changed successfully",
+                                  confirmButtonColor: "#F25F3A",
+                                });
+                              } else {
+                                Swal.fire({
+                                  icon: "error",
+                                  title: `Subscription change Subscription please try again later`,
+                                  text: "Failed to change ",
+                                  confirmButtonColor: "#F25F3A",
+                                });
+                              }
+                            }
+                          });
                         } else {
                           setBillingInfo({
                             billing: false,
